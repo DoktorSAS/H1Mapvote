@@ -39,7 +39,7 @@ mv_Config()
 {
 	SetDvarIfNotInizialized("mv_enable", 1);
 	if (getDvarInt("mv_enable") != 1) // Check if mapvote is enable
-		return;						  // End if the mapvote its not enable
+		return; // End if the mapvote its not enable
 
 	level.__mapvote = [];
 	SetDvarIfNotInizialized("mv_time", 20);
