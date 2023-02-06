@@ -1,4 +1,4 @@
-# H1: Call of duty: Modern Warfare Remastered 
+# H1: Call of Duty: Modern Warfare Remastered 
 Developed by [@DoktorSAS](https://twitter.com/DoktorSAS)
 
 ![Preview](https://pbs.twimg.com/media/Fn9U5ubXgAEpzCg?format=jpg&name=large)
