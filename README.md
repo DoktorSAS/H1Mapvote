@@ -6,7 +6,7 @@ Developed by [@DoktorSAS](https://twitter.com/DoktorSAS)
 ### Requirements
 
 - The script can only work on Server's, It will not work in private games.
-- Server must be hosted on Plutonium client, the script works only on Plutonium client.
+- Server must be hosted on H1-MOD client, the script works only on Plutonium client.
 
 #### How to setup the mapvote step by step 
 
