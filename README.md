@@ -10,7 +10,7 @@ Developed by [@DoktorSAS](https://twitter.com/DoktorSAS)
 
 #### How to setup the mapvote step by step 
 
- 1) Copy the file in your Directory %localappdata%\xlabs\data\iw6\data\
+ 1) Copy the file in your Directory %localappdata%\h1-mod\data\cdata\scripts
  3) Copy the Content of the mapvote.cfg in your .cfg (Exemple: server.cfg, dedicated_mp.cfg, dedicated.cfg, etc ) file that manages the Server.
  4) Edit the Dvars to setup the Server, many Dvars are only for Aesthetic Parameters.
     - set the Dvar mv_maps to decide the maps that will be shown in mapvote, Example:
