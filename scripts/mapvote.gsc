@@ -335,7 +335,7 @@ mv_SetRotation(mapid, gametype)
 {
 	array = strTok(gametype, ";");
 	str = "";
-	if (array.size > 0)
+	if (array.size > 1)
 	{
 		str = "gametype " + array[0];
 	}
