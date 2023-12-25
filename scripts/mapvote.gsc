@@ -433,8 +433,6 @@ FixBlur() // Patch blur effect
 
 main()
 {
-	// replacefunc do not work as intended once patched remove // in front of one of the next 2 lines
-
 	replacefunc( maps\mp\gametypes\_gamelogic::waittillfinalkillcamdone, ::waittillfinalkillcamdone);
 }
 waittillfinalkillcamdone()
