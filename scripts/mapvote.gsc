@@ -344,6 +344,7 @@ mv_SetRotation(mapid, gametype)
 	setdvar("sv_currentmaprotation", str + " map " + mapid);
 	setdvar("sv_maprotationcurrent", str + " map " + mapid);
 	setdvar("sv_maprotation", str + " map " + mapid);
+	setdvar("sv_map_rotation_current", str + " map " + mapid);
 	level notify("mv_ended");
 }
 
