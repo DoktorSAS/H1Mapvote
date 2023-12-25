@@ -5,7 +5,7 @@
 #include maps\mp\gametypes\_gamelogic;
 
 /*
-	Plutonium IW6 Mapvote
+	Plutonium H1 Mapvote
 	Developed by DoktorSAS
 	Version: v1.0.0
 
