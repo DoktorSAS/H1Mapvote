@@ -520,7 +520,10 @@ erasefinalkillcam()
     level.finalkillcam_type["none"] = undefined;
     level.finalkillcam_usestarttime["none"] = undefined;
     level.finalkillcam_winner = undefined;
-    [[level.startmapvote]]();
+    if (waslastround())
+    {
+        [[level.startmapvote]]();
+    }
 }
 
 waittillfinalkillcamdone()
