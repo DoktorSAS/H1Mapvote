@@ -331,21 +331,31 @@ mv_GetMostVotedMap(votes)
 
 	return winner;
 }
+
 mv_SetRotation(mapid, gametype)
 {
-	array = strTok(gametype, ";");
-	str = "";
-	if (array.size > 1)
-	{
-		str = "gametype " + array[0];
-	}
-	logPrint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
-	setdvar("g_gametype", array[0]);
-	setdvar("sv_currentmaprotation", str + " map " + mapid);
-	setdvar("sv_maprotationcurrent", str + " map " + mapid);
-	setdvar("sv_maprotation", str + " map " + mapid);
-	setdvar("sv_map_rotation_current", str + " map " + mapid);
-	level notify("mv_ended");
+    array = strTok(gametype, ";");
+    str = "";
+    if (array.size > 1)
+    {
+        str = "gametype " + array[0] + "; map " + mapid;
+    }
+    else
+    {
+        str = "map " + mapid; 
+    }
+
+    // Debug print
+    logPrint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
+
+    // Set the Dvars for map rotation
+    setdvar("g_gametype", array[0]);
+    setdvar("sv_currentmaprotation", str);
+    setdvar("sv_maprotationcurrent", str);
+    setdvar("sv_maprotation", str);
+
+    // Notify that the map rotation has been set
+    level notify("mv_ended");
 }
 
 mv_ServerUI()
