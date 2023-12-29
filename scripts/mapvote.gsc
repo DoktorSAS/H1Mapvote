@@ -590,7 +590,7 @@ maptoname(mapid)
 maptoloadscreen(mapid)
 {
 	mapid = tolower(mapid);
-	return "loadscreen_mp_" + mapid;
+	return "loadscreen_" + mapid;
 
  	
 	/*	
