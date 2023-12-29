@@ -82,10 +82,17 @@ mv_Begin()
 
 		level.__mapvote["map1"].mapname = maptoname(mapschoosed[0]);
 		level.__mapvote["map1"].mapid = mapschoosed[0];
+		level.__mapvote["map3"].loadscreen = maptoloadscreen(mapschoosed[0]);
 		level.__mapvote["map2"].mapname = maptoname(mapschoosed[1]);
 		level.__mapvote["map2"].mapid = mapschoosed[1];
+		level.__mapvote["map3"].loadscreen = maptoloadscreen(mapschoosed[1]);
 		level.__mapvote["map3"].mapname = maptoname(mapschoosed[2]);
 		level.__mapvote["map3"].mapid = mapschoosed[2];
+		level.__mapvote["map3"].loadscreen = maptoloadscreen(mapschoosed[2]);
+
+		preCacheShader(level.__mapvote["map1"].loadscreen);
+		preCacheShader(level.__mapvote["map2"].loadscreen);
+		preCacheShader(level.__mapvote["map3"].loadscreen);
 
 		gametypes = strTok(getDvar("mv_gametypes"), " ");
 		g1 = gametypes[randomIntRange(0, gametypes.size)];
@@ -578,6 +585,42 @@ maptoname(mapid)
     if (mapid == "mp_crash_snow") return "Winter Crash";
     if (mapid == "mp_farm_spring") return "Day Break";
     if (mapid == "mp_bog_summer") return "Beach Bog";
+    return mapid;
+}
+maptoloadscreen(mapid)
+{
+	mapid = tolower(mapid);
+	return "loadscreen_mp_" + mapid;
+
+ 	
+	/*	
+		If there are maps that have unconventional file names, use an if case and change the return value to the appropriate one.
+
+		if (mapid == "mp_convoy") return "loadscreen_mp_convoy";
+		if (mapid == "mp_backlot") return "loadscreen_mp_backlot";
+		if (mapid == "mp_bog") return "loadscreen_mp_bog";
+		if (mapid == "mp_crash") return "loadscreen_mp_crash";
+		if (mapid == "mp_crossfire") return "loadscreen_mp_crossfire";
+		if (mapid == "mp_citystreets") return "loadscreen_mp_citystreets";
+		if (mapid == "mp_farm") return "loadscreen_mp_farm";
+		if (mapid == "mp_overgrown") return "loadscreen_mp_overgrown";
+		if (mapid == "mp_shipment") return "loadscreen_mp_shipment";
+		if (mapid == "mp_vacant") return "loadscreen_mp_vacant";
+		if (mapid == "mp_vlobby_room") return "loadscreen_mp_vlobby_room";
+		if (mapid == "mp_broadcast") return "loadscreen_mp_broadcast";
+		if (mapid == "mp_carentan") return "loadscreen_mp_carentan";
+		if (mapid == "mp_countdown") return "loadscreen_mp_countdown";
+		if (mapid == "mp_bloc") return "loadscreen_mp_bloc";
+		if (mapid == "mp_creek") return "loadscreen_mp_creek";
+		if (mapid == "mp_killhouse") return "loadscreen_mp_killhouse";
+		if (mapid == "mp_pipeline") return "loadscreen_mp_pipeline";
+		if (mapid == "mp_strike") return "loadscreen_mp_strike";
+		if (mapid == "mp_showdown") return "loadscreen_mp_showdown";
+		if (mapid == "mp_cargoship") return "loadscreen_mp_cargoship";
+		if (mapid == "mp_crash_snow") return "loadscreen_mp_crash_snow";
+		if (mapid == "mp_farm_spring") return "loadscreen_mp_farm_spring";
+		if (mapid == "mp_bog_summer") return "loadscreen_mp_bog_summer";
+	*/
     return mapid;
 }
 SetDvarIfNotInizialized(dvar, value)
