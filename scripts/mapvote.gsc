@@ -22,51 +22,7 @@ init()
 	preCacheShader("line_vertical");
 
 	level thread onPlayerConnected();
-	level thread mv_Config();
-
-	level.startmapvote = ::startMapvote;
-}
-
-startMapvote()
-{
-	if (wasLastRound())
-	{
-		mv_Begin();
-	}
-}
-
-mv_Config()
-{
-	SetDvarIfNotInizialized("mv_enable", 1);
-	if (getDvarInt("mv_enable") != 1) // Check if mapvote is enable
-		return; // End if the mapvote its not enable
-
-	level.__mapvote = [];
-	SetDvarIfNotInizialized("mv_time", 20);
-	level.__mapvote["time"] = getDvarInt("mv_time");
-	SetDvarIfNotInizialized("mv_maps", "mp_convoy mp_backlot mp_bog mp_crash mp_crossfire mp_citystreets mp_farm mp_overgrown mp_shipment mp_vacant mp_broadcast mp_carentan mp_countdown mp_bloc mp_creek mp_killhouse mp_pipeline mp_strike mp_showdown mp_cargoship mp_crash_snow mp_farm_spring mp_bog_summer");
-
-	SetDvarIfNotInizialized("mv_credits", 1);
-	SetDvarIfNotInizialized("mv_socials", 1);
-	SetDvarIfNotInizialized("mv_socialname", "Website");
-	SetDvarIfNotInizialized("mv_sociallink", "^3h1.gg^7");
-	SetDvarIfNotInizialized("mv_sentence", "Thanks for Playing by @DoktorSAS");
-	SetDvarIfNotInizialized("mv_votecolor", "5");
-	SetDvarIfNotInizialized("mv_blur", "3");
-	SetDvarIfNotInizialized("mv_scrollcolor", "cyan");
-	SetDvarIfNotInizialized("mv_selectcolor", "lightgreen");
-	SetDvarIfNotInizialized("mv_backgroundcolor", "grey");
-	SetDvarIfNotInizialized("mv_gametypes", "dm;dm.cfg war;war.cfg sd;sd.cfg");
-	setDvarIfNotInizialized("mv_excludedmaps", "");
-}
-
-// Mapvote Logic
-mv_Begin()
-{
-	level endon("mv_ended");
-
-	if (getDvarInt("mv_enable") != 1) // Check if mapvote is enable
-		return;						  // End if the mapvote its not enable
+	level thread MapvoteConfig();
 
 	if (!isDefined(level.mapvote_started))
 	{
@@ -74,379 +30,37 @@ mv_Begin()
 
 		mapsIDs = [];
 		mapsIDs = strTok(getDvar("mv_maps"), " ");
-		mapschoosed = mv_GetRandomMaps(mapsIDs);
+		mapschoosed = MapvoteChooseRandomMapsSelection(mapsIDs);
 
-		level.__mapvote["map1"] = spawnStruct();
-		level.__mapvote["map2"] = spawnStruct();
-		level.__mapvote["map3"] = spawnStruct();
+		level.mapvotedata["firstmap"] = spawnStruct();
+		level.mapvotedata["secondmap"] = spawnStruct();
+		level.mapvotedata["thirdmap"] = spawnStruct();
 
-		level.__mapvote["map1"].mapname = maptoname(mapschoosed[0]);
-		level.__mapvote["map1"].mapid = mapschoosed[0];
-		level.__mapvote["map3"].loadscreen = maptoloadscreen(mapschoosed[0]);
-		level.__mapvote["map2"].mapname = maptoname(mapschoosed[1]);
-		level.__mapvote["map2"].mapid = mapschoosed[1];
-		level.__mapvote["map3"].loadscreen = maptoloadscreen(mapschoosed[1]);
-		level.__mapvote["map3"].mapname = maptoname(mapschoosed[2]);
-		level.__mapvote["map3"].mapid = mapschoosed[2];
-		level.__mapvote["map3"].loadscreen = maptoloadscreen(mapschoosed[2]);
+		level.mapvotedata["firstmap"].mapname = mapToDisplayName(mapschoosed[0]);
+		level.mapvotedata["firstmap"].mapid = mapschoosed[0];
+		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[0]);
+		level.mapvotedata["secondmap"].mapname = mapToDisplayName(mapschoosed[1]);
+		level.mapvotedata["secondmap"].mapid = mapschoosed[1];
+		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[1]);
+		level.mapvotedata["thirdmap"].mapname = mapToDisplayName(mapschoosed[2]);
+		level.mapvotedata["thirdmap"].mapid = mapschoosed[2];
+		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[2]);
 
-		preCacheShader(level.__mapvote["map1"].loadscreen);
-		preCacheShader(level.__mapvote["map2"].loadscreen);
-		preCacheShader(level.__mapvote["map3"].loadscreen);
+		//preCacheShader(level.mapvotedata["firstmap"].loadscreen);
+		//preCacheShader(level.mapvotedata["secondmap"].loadscreen);
+		//preCacheShader(level.mapvotedata["thirdmap"].loadscreen);
 
 		gametypes = strTok(getDvar("mv_gametypes"), " ");
 		g1 = gametypes[randomIntRange(0, gametypes.size)];
 		g2 = gametypes[randomIntRange(0, gametypes.size)];
 		g3 = gametypes[randomIntRange(0, gametypes.size)];
 
-		level.__mapvote["map1"].gametype = g1;
-		level.__mapvote["map2"].gametype = g2;
-		level.__mapvote["map3"].gametype = g3;
-
-		foreach (player in level.players)
-		{
-			if (!is_bot(player))
-				player thread mv_PlayerUI();
-		}
-		wait 0.2;
-		level thread mv_ServerUI();
-
-		mv_VoteManager();
-	}
-}
-
-ArrayRemoveIndex(array, index)
-{
-	new_array = [];
-	for (i = 0; i < array.size; i++)
-	{
-		if (i != index)
-			new_array[new_array.size] = array[i];
-	}
-	array = new_array;
-	return new_array;
-}
-
-mv_GetRandomMaps(mapsIDs) // Select random map from the list
-{
-	mapschoosed = [];
-	for (i = 0; i < 3; i++)
-	{
-		index = randomIntRange(0, mapsIDs.size);
-		map = mapsIDs[index];
-		mapsIDs = ArrayRemoveIndex(mapsIDs, map);
-		mapschoosed[i] = map;
+		level.mapvotedata["firstmap"].gametype = g1;
+		level.mapvotedata["secondmap"].gametype = g2;
+		level.mapvotedata["thirdmap"].gametype = g3;
 	}
 
-	return mapschoosed;
-}
-
-is_bot(entity) // Check if a players is a bot
-{
-	return isDefined(entity.pers["isBot"]) && entity.pers["isBot"];
-}
-
-mv_PlayerUI()
-{
-	// self endon("disconnect");
-	level endon("game_ended");
-
-	self SetBlurForPlayer(getDvarFloat("mv_blur"), 1.5);
-
-	scroll_color = getColor(getDvar("mv_scrollcolor"));
-	bg_color = getColor(getDvar("mv_backgroundcolor"));
-	self freezeControlsWrapper(1);
-	boxes = [];
-	boxes[0] = self createRectangle("center", "center", -220, -452, 205, 133, scroll_color, "white", 1, .7);
-	boxes[1] = self createRectangle("center", "center", 0, -452, 205, 133, bg_color, "white", 1, .7);
-	boxes[2] = self createRectangle("center", "center", 220, -452, 205, 133, bg_color, "white", 1, .7);
-
-	self thread mv_PlayerFixAngle();
-
-	level waittill("mv_start_animation");
-
-	boxes[0] affectElement("y", 1.2, -50);
-	boxes[1] affectElement("y", 1.2, -50);
-	boxes[2] affectElement("y", 1.2, -50);
-	self thread destroyBoxes(boxes);
-
-	self notifyonplayercommand("left", "+attack");
-	self notifyonplayercommand("right", "+speed_throw");
-	self notifyonplayercommand("left", "+moveright");
-	self notifyonplayercommand("right", "+moveleft");
-	self notifyonplayercommand("select", "+usereload");
-	self notifyonplayercommand("select", "+activate");
-	self notifyonplayercommand("select", "+gostand");
-
-	self.statusicon = "veh_hud_target_chopperfly"; // Red dot
-	level waittill("mv_start_vote");
-
-	index = 0;
-	isVoting = 1;
-	while (level.__mapvote["time"] > 0 && isVoting)
-	{
-		command = self waittill_any_return("left", "right", "select", "done");
-		if (command == "right")
-		{
-			index++;
-			if (index == boxes.size)
-				index = 0;
-		}
-		else if (command == "left")
-		{
-			index--;
-			if (index < 0)
-				index = boxes.size - 1;
-		}
-
-		if (command == "select")
-		{
-			self.statusicon = "compass_icon_vf_active"; // Green dot
-			vote = "vote" + (index + 1);
-			level notify(vote);
-			select_color = getColor(getDvar("mv_selectcolor"));
-			boxes[index] affectElement("color", 0.2, select_color);
-			isVoting = 0;
-		}
-		else
-		{
-			for (i = 0; i < boxes.size; i++)
-			{
-				if (i != index)
-					boxes[i] affectElement("color", 0.2, bg_color);
-				else
-					boxes[i] affectElement("color", 0.2, scroll_color);
-			}
-		}
-	}
-}
-
-destroyBoxes(boxes)
-{
-	level endon("game_ended");
-	level waittill("mv_destroy_hud");
-	foreach (box in boxes)
-	{
-		box affectElement("alpha", 0.5, 0);
-	}
-}
-
-mv_PlayerFixAngle()
-{
-	self endon("disconnect");
-	level endon("game_ended");
-	level waittill("mv_start_vote");
-	angles = self getPlayerAngles();
-
-	self waittill_any("left", "right");
-	if (self getPlayerAngles() != angles)
-		self setPlayerAngles(angles);
-}
-
-mv_VoteManager()
-{
-	level endon("game_ended");
-	votes = [];
-	votes[0] = spawnStruct();
-	votes[0].votes = level createServerFontString("objective", 2);
-	votes[0].votes setPoint("center", "center", -220 + 70, -325);
-	votes[0].votes.label = &"^" + getDvar("mv_votecolor");
-	votes[0].votes.sort = 4;
-	votes[0].value = 0;
-	votes[0].map = level.__mapvote["map1"];
-
-	votes[1] = spawnStruct();
-	votes[1].votes = level createServerFontString("objective", 2);
-	votes[1].votes setPoint("center", "center", 0 + 70, -325);
-	votes[1].votes.label = &"^" + getDvar("mv_votecolor");
-	votes[1].votes.sort = 4;
-	votes[1].value = 0;
-	votes[1].map = level.__mapvote["map2"];
-
-	votes[2] = spawnStruct();
-	votes[2].votes = level createServerFontString("objective", 2);
-	votes[2].votes setPoint("center", "center", 220 + 70, -325);
-	votes[2].votes.label = &"^" + getDvar("mv_votecolor");
-	votes[2].votes.sort = 4;
-	votes[2].value = 0;
-	votes[2].map = level.__mapvote["map3"];
-
-	votes[0].votes setValue(0);
-	votes[1].votes setValue(0);
-	votes[2].votes setValue(0);
-
-	votes[0].votes affectElement("y", 1, 0);
-	votes[1].votes affectElement("y", 1, 0);
-	votes[2].votes affectElement("y", 1, 0);
-
-	votes[0].hideWhenInMenu = 1;
-	votes[1].hideWhenInMenu = 1;
-	votes[2].hideWhenInMenu = 1;
-
-	isInVote = 1;
-	index = 0;
-	while (isInVote)
-	{
-		notify_value = level waittill_any_return("vote1", "vote2", "vote3", "mv_destroy_hud");
-
-		if (notify_value == "mv_destroy_hud")
-		{
-			isInVote = 0;
-
-			votes[0].votes affectElement("alpha", 0.5, 0);
-			votes[1].votes affectElement("alpha", 0.5, 0);
-			votes[2].votes affectElement("alpha", 0.5, 0);
-
-			break;
-		}
-		else
-		{
-			switch (notify_value)
-			{
-			case "vote1":
-				index = 0;
-				break;
-			case "vote2":
-				index = 1;
-				break;
-			case "vote3":
-				index = 2;
-				break;
-			}
-			votes[index].value++;
-			votes[index].votes setValue(votes[index].value);
-		}
-	}
-
-	winner = mv_GetMostVotedMap(votes);
-	map = winner.map;
-	mv_SetRotation(map.mapid, map.gametype);
-
-	wait 1.2;
-}
-
-mv_GetMostVotedMap(votes)
-{
-	winner = votes[0];
-	for (i = 1; i < votes.size; i++)
-	{
-		if (isDefined(votes[i]) && votes[i].value > winner.value)
-		{
-			winner = votes[i];
-		}
-	}
-
-	return winner;
-}
-
-mv_SetRotation(mapid, gametype)
-{
-    array = strTok(gametype, ";");
-    str = "";
-    if (array.size > 1)
-    {
-        str = "gametype " + array[0] + "; map " + mapid;
-    }
-    else
-    {
-        str = "map " + mapid; 
-    }
-
-    // Debug print
-    logPrint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
-
-    // Set the Dvars for map rotation
-    setdvar("g_gametype", array[0]);
-    setdvar("sv_currentmaprotation", str);
-    setdvar("sv_maprotationcurrent", str);
-    setdvar("sv_maprotation", str);
-
-    // Notify that the map rotation has been set
-    level notify("mv_ended");
-}
-
-mv_ServerUI()
-{
-	level endon("game_ended");
-
-	buttons = level createServerFontString("objective", 1.6);
-	buttons setText("^3[{+speed_throw}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]");
-	buttons setPoint("center", "center", 0, 80);
-	buttons.hideWhenInMenu = 0;
-
-	mv_votecolor = getDvar("mv_votecolor");
-
-	mapUI1 = level createString("^7" + level.__mapvote["map1"].mapname + "\n" + gametypeToName(strTok(level.__mapvote["map1"].gametype, ";")[0]), "objective", 1.1, "center", "center", -220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
-	mapUI2 = level createString("^7" + level.__mapvote["map2"].mapname + "\n" + gametypeToName(strTok(level.__mapvote["map2"].gametype, ";")[0]), "objective", 1.1, "center", "center", 0, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
-	mapUI3 = level createString("^7" + level.__mapvote["map3"].mapname + "\n" + gametypeToName(strTok(level.__mapvote["map3"].gametype, ";")[0]), "objective", 1.1, "center", "center", 220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
-
-	mapUIBTXT1 = level createRectangle("center", "center", -220, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
-	mapUIBTXT2 = level createRectangle("center", "center", 0, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
-	mapUIBTXT3 = level createRectangle("center", "center", 220, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
-
-	level notify("mv_start_animation");
-	mapUI1 affectElement("y", 1.2, -6);
-	mapUI2 affectElement("y", 1.2, -6);
-	mapUI3 affectElement("y", 1.2, -6);
-	mapUIBTXT1 affectElement("alpha", 1.5, 0.8);
-	mapUIBTXT2 affectElement("alpha", 1.5, 0.8);
-	mapUIBTXT3 affectElement("alpha", 1.5, 0.8);
-
-	/*mv_arrowcolor = GetColor(getDvar("mv_arrowcolor"));
-
-	arrow_right = drawshader("arrow_left", 200, 290, 25, 25, mv_arrowcolor, 100, 2, "center", "center", 1);
-	arrow_left = drawshader("arrow_right", -200, 290, 25, 25, mv_arrowcolor, 100, 2, "center", "center", 1);*/
-
-	wait 1;
-	level notify("mv_start_vote");
-
-	mv_sentence = getDvar("mv_sentence");
-	mv_socialname = getDvar("mv_socialname");
-	mv_sociallink = getDvar("mv_sociallink");
-	credits = level createServerFontString("objective", 1.2);
-	credits setPoint("center", "center", -200, 180);
-	credits setText(mv_sentence + "\nDeveloped by @^5DoktorSAS ^7\n" + mv_socialname + ": " + mv_sociallink);
-
-	timer = level createServerFontString("objective", 2);
-	timer setPoint("center", "center", 0, -140);
-	timer setTimer(level.__mapvote["time"]);
-	wait level.__mapvote["time"];
-	level notify("mv_destroy_hud");
-
-	credits affectElement("alpha", 0.5, 0);
-	buttons affectElement("alpha", 0.5, 0);
-	mapUI1 affectElement("alpha", 0.5, 0);
-	mapUI2 affectElement("alpha", 0.5, 0);
-	mapUI3 affectElement("alpha", 0.5, 0);
-	mapUIBTXT1 affectElement("alpha", 0.5, 0);
-	mapUIBTXT2 affectElement("alpha", 0.5, 0);
-	mapUIBTXT3 affectElement("alpha", 0.5, 0);
-	// arrow_right affectElement("alpha", 0.5, 0);
-	// arrow_left affectElement("alpha", 0.5, 0);
-	timer affectElement("alpha", 0.5, 0);
-
-	foreach (player in level.players)
-	{
-		player notify("done");
-		player SetBlurForPlayer(0, 0);
-	}
-}
-
-onPlayerConnected()
-{
-	level endon("game_ended");
-	for (;;)
-	{
-		level waittill("connected", player);
-		player thread FixBlur();
-	}
-}
-FixBlur() // Patch blur effect
-{
-	self endon("disconnect");
-	level endon("game_ended");
-	self waittill("spawned_player");
-	self SetBlurForPlayer(0, 0);
+	level.CallMapvote = ::CallMapvote;
 }
 
 main()
@@ -457,6 +71,7 @@ main()
 		replacefunc( maps\mp\gametypes\_damage::erasefinalkillcam, ::erasefinalkillcam);
 	}
 }
+
 erasefinalkillcam()
 {
     if ( level.multiteambased )
@@ -540,7 +155,7 @@ erasefinalkillcam()
     level.finalkillcam_winner = undefined;
     if (waslastround())
     {
-        [[level.startmapvote]]();
+        [[level.CallMapvote]]();
     }
 }
 
@@ -552,13 +167,506 @@ waittillfinalkillcamdone()
     level waittill( "final_killcam_done" );
     if (waslastround())
     {
-        [[level.startmapvote]]();
+        [[level.CallMapvote]]();
     }
 
     return 1;
 }
+
+
+/**
+ * This script handles the blur effect fix for players when they connect to the game.
+ * It includes an event handler for player connection and a function to patch the blur effect.
+ */
+
+onPlayerConnected()
+{
+	level endon("game_ended");
+	for (;;)
+	{
+		level waittill("connected", player);
+		player thread FixBlur();
+	}
+}
+
+/**
+ * This function patches the blur effect for the player.
+ * It waits for the player to spawn and then sets the blur values to 0.
+ */
+FixBlur()
+{
+	self endon("disconnect");
+	level endon("game_ended");
+	self waittill("spawned_player");
+	self SetBlurForPlayer(0, 0);
+}
+
+/*
+ * Functions related to the mapvote funcitonality
+ * Functions:
+ *  - CallMapvote()
+ *  - MapvoteConfig()
+ *  - ExecuteMapvote()
+ *  - MapvoteChooseRandomMapsSelection(mapsIDs)
+ *  - MapvotePlayerUI()
+ *  - destroyBoxes(boxes)
+ *  - MapvoteForceFixedAngle()
+ *  - CreateVoteDisplay(x, y)
+ *  - CreateVoteDisplayObject(x, y, map)
+ *  - MapvoteHandler()
+ *  - MapvoteGetMostVotedMap(votes)
+ *  - MapvoteSetRotation(mapid, gametype)
+ *  - MapvoteServerUI()
+ *  - FixBlur()
+ *  - mapToDisplayName(mapid)
+ *  - mapidToLoadscreen(mapid)
+ *  - gametypeToDisplayName(gametype)
+*/
+
+/**
+ * Calls the map vote function if it is the last round.
+ */
+CallMapvote()
+{
+	if (wasLastRound())
+	{
+		ExecuteMapvote();
+	}
+}
+
+/**
+ * Configures the map vote settings.
+ */
+MapvoteConfig()
+{
+	SetDvarIfNotInizialized("mv_enable", 1);
+	if (getDvarInt("mv_enable") != 1) // Check if mapvote is enable
+		return; // End if the mapvote its not enable
+
+	level.mapvotedata = [];
+	SetDvarIfNotInizialized("mv_time", 20);
+	level.mapvotedata["time"] = getDvarInt("mv_time");
+	SetDvarIfNotInizialized("mv_maps", "mp_convoy mp_backlot mp_bog mp_crash mp_crossfire mp_citystreets mp_farm mp_overgrown mp_shipment mp_vacant mp_broadcast mp_carentan mp_countdown mp_bloc mp_creek mp_killhouse mp_pipeline mp_strike mp_showdown mp_cargoship mp_crash_snow mp_farm_spring mp_bog_summer");
+
+	SetDvarIfNotInizialized("mv_credits", 1);
+	SetDvarIfNotInizialized("mv_socialsmv_socials", 1);
+	SetDvarIfNotInizialized("mv_socialname", "Website");
+	SetDvarIfNotInizialized("mv_sociallink", "^3h1.gg^7");
+	SetDvarIfNotInizialized("mv_sentence", "Thanks for Playing by @DoktorSAS");
+	SetDvarIfNotInizialized("mv_votecolor", "5");
+	SetDvarIfNotInizialized("mv_blur", "3");
+	SetDvarIfNotInizialized("mv_scrollcolor", "cyan");
+	SetDvarIfNotInizialized("mv_selectcolor", "lightgreen");
+	SetDvarIfNotInizialized("mv_backgroundcolor", "grey");
+	SetDvarIfNotInizialized("mv_gametypes", "dm;dm.cfg war;war.cfg sd;sd.cfg");
+	setDvarIfNotInizialized("mv_allowchangevote", 1);
+}
+
+/**
+ * Executes the map vote process.
+ * This function checks if map voting is enabled and then displays the map vote UI to all players.
+ * It also starts the map vote handler to handle player votes.
+ */
+ExecuteMapvote()
+{
+	level endon("mv_ended");
+
+	if (getDvarInt("mv_enable") != 1) // Check if mapvote is enable
+		return;						  // End if the mapvote its not enable
+
+	foreach (player in level.players)
+	{
+		if (!is_bot(player))
+			player thread MapvotePlayerUI();
+	}
+	
+	waittillframeend;
+
+	level thread MapvoteServerUI();
+	MapvoteHandler();
+}
+
+/**
+ * Selects random maps from the given list.
+ * 
+ * @param mapsIDs - The array of map IDs to choose from.
+ * @returns An array of randomly selected map IDs.
+ */
+MapvoteChooseRandomMapsSelection(mapsIDs)
+{
+	mapschoosed = [];
+	for (i = 0; i < 3; i++)
+	{
+		index = randomIntRange(0, mapsIDs.size);
+		map = mapsIDs[index];
+		mapsIDs = ArrayRemoveByIndex(mapsIDs, map);
+		mapschoosed[i] = map;
+	}
+
+	return mapschoosed;
+}
+
+/**
+ * Displays the map voting UI for players.
+ * 
+ * This function creates three rectangles representing the map voting options.
+ * It handles player input for navigating and selecting map options.
+ * The selected map option is highlighted with a different color.
+ * The function continues until the map voting time expires or the voting is disabled.
+ */
+MapvotePlayerUI()
+{
+	self endon("disconnect");
+	level endon("game_ended");
+
+	/**
+	 * Sets the scroll color and background color based on the values of the "mv_scrollcolor" and "mv_backgroundcolor" dvars.
+	 * 
+	 * @param scrollcolor The color for the scroll.
+	 * @param bgcolor The background color.
+	 */
+	scrollcolor = getColor(getDvar("mv_scrollcolor"));
+	bgcolor = getColor(getDvar("mv_backgroundcolor"));
+
+	self SetBlurForPlayer(getDvarFloat("mv_blur"), 1.5);
+	self freezeControlsWrapper(1);
+
+	boxes = [];
+	boxes[0] = self CreateRectangle("center", "center", -220, -452, 205, 133, scrollcolor, "white", 1, 1);
+	boxes[1] = self CreateRectangle("center", "center", 0, -452, 205, 133, bgcolor, "white", 1, 1);
+	boxes[2] = self CreateRectangle("center", "center", 220, -452, 205, 133, bgcolor, "white", 1, 1);
+
+	self thread MapvoteForceFixedAngle();
+
+	level waittill("mapvote_animate");
+
+	boxes[0] affectElement("y", 1.2, -50);
+	boxes[1] affectElement("y", 1.2, -50);
+	boxes[2] affectElement("y", 1.2, -50);
+	self thread destroyBoxes(boxes);
+
+	self notifyonplayercommand("left", "+attack");
+	self notifyonplayercommand("right", "+speed_throw");
+	self notifyonplayercommand("left", "+moveright");
+	self notifyonplayercommand("right", "+moveleft");
+	self notifyonplayercommand("select", "+usereload");
+	self notifyonplayercommand("select", "+activate");
+	self notifyonplayercommand("select", "+gostand");
+
+	self.statusicon = "veh_hud_target_chopperfly"; // Red dot
+	level waittill("mapvote_start");
+
+	index = 0;
+	previuesindex = -1;
+	voting = 1;
+	while (level.mapvotedata["time"] > 0 && voting)
+	{
+		command = self waittill_any_return("left", "right", "select", "mapvote_end");
+		if (command == "right")
+		{
+			index++;
+			if (index == boxes.size)
+				index = 0;
+		}
+		else if (command == "left")
+		{
+			index--;
+			if (index < 0)
+				index = boxes.size - 1;
+		}
+
+		if (command == "select")
+		{
+			self.statusicon = "compass_icon_vf_active"; // Green dot
+			if(previuesindex >= 0)
+			{
+				select_color = getColor(getDvar("mv_selectcolor"));
+				boxes[previuesindex] affectElement("color", 0.2, bgcolor);
+				level notify("vote", previuesindex, -1);
+			}
+			waittillframeend; // DO NOT REMOVE THIS LINE: IF REMOVED IT WILL CAUSE THE SECOND NOTIFY TO FAIL
+			level notify("vote", index, 1);
+			previuesindex = index;
+
+			select_color = getColor(getDvar("mv_selectcolor"));
+			boxes[index] affectElement("color", 0.2, select_color);
+			if( GetDvarInt("mv_allowchangevote", 1) == 0)
+			{
+				voting = 0;
+			}
+		}
+		else
+		{
+			for (i = 0; i < boxes.size; i++)
+			{
+				if (i != index)
+					boxes[i] affectElement("color", 0.2, bgcolor);
+				else
+					boxes[i] affectElement("color", 0.2, scrollcolor);
+			}
+		}
+	}
+}
+
+/**
+ * Function to destroy boxes.
+ * @param boxes - An array of boxes to be destroyed.
+ */
+destroyBoxes(boxes)
+{
+	level endon("game_ended");
+	level waittill("mapvote_end");
+	foreach (box in boxes)
+	{
+		box affectElement("alpha", 0.5, 0);
+	}
+}
+
+/**
+ * Function to force fixed angle for players during map voting.
+ * Players' angles are stored before the vote starts and restored if they try to change it during the vote.
+ */
+MapvoteForceFixedAngle()
+{
+	self endon("disconnect");
+	level endon("game_ended");
+	level waittill("mapvote_start");
+
+	// Store the initial angles of the player
+	angles = self getPlayerAngles();
+
+	self waittill_any("left", "right");
+
+	// Check if the player's angles have changed
+	if (self getPlayerAngles() != angles)
+		self setPlayerAngles(angles);
+}
+
+/**
+ * Creates a vote display area at the specified coordinates.
+ * 
+ * @param x The x-coordinate of the display area.
+ * @param y The y-coordinate of the display area.
+ * @return The created display area.
+ */
+CreateVoteDisplay(x, y)
+{
+	displayarea = createServerFontString("objective", 2);
+	displayarea setPoint("center", "center", x, y);
+	displayarea.label = &"^" + getDvar("mv_votecolor");
+	displayarea.sort = 4;
+	displayarea.alpha = 1;
+	displayarea.hideWhenInMenu = 0;
+	displayarea setValue(0);
+	return displayarea;
+}
+/**
+ * Creates a vote display object with the specified coordinates and map.
+ * 
+ * @param x The x-coordinate of the display object.
+ * @param y The y-coordinate of the display object.
+ * @param map The map associated with the display object.
+ * @return The created vote display object.
+ */
+CreateVoteDisplayObject(x, y, map)
+{
+	displayobject = spawnStruct();
+	displayobject.displayarea = CreateVoteDisplay(x, y);
+	displayobject.value = 0;
+	displayobject.map = map;
+	return displayobject;
+}
+
+/**
+ * Handles the map voting process.
+ */
+MapvoteHandler()
+{
+	level endon("game_ended");
+	votes = [];
+
+	votes[0] = level CreateVoteDisplayObject(-220 + 70, -325, level.mapvotedata["firstmap"]);
+	votes[1] = level CreateVoteDisplayObject(0 + 70, -325, level.mapvotedata["secondmap"]);
+	votes[2] = level CreateVoteDisplayObject(220 + 70, -325, level.mapvotedata["thirdmap"]);
+
+	votes[0].displayarea affectElement("y", 1, 0);
+	votes[1].displayarea affectElement("y", 1, 0);
+	votes[2].displayarea affectElement("y", 1, 0);
+
+	voting = true;
+	index = 0;
+	while (voting)
+	{
+		/*
+			The index represents the map ID voted while the value will be valued as 1 if it's a vote to add and
+			will be set to 0 if it's a vote to remove.
+		*/
+		level waittill("vote", index, value);
+
+		if(index == -1) 
+		{
+			voting = false;
+
+			votes[0].displayarea affectElement("alpha", 0.5, 0);
+			votes[1].displayarea affectElement("alpha", 0.5, 0);
+			votes[2].displayarea affectElement("alpha", 0.5, 0);
+			break;
+		}
+		else
+		{
+			votes[index].value += value;
+			votes[index].displayarea setValue(votes[index].value);
+		}
+	}
+
+	winner = MapvoteGetMostVotedMap(votes);
+	map = winner.map;
+	MapvoteSetRotation(map.mapid, map.gametype);
+
+	wait 1.2;
+}
+
+/**
+ * Returns the map with the highest number of votes.
+ *
+ * @param votes An array of vote objects.
+ * @return The map object with the highest number of votes.
+ */
+MapvoteGetMostVotedMap(votes)
+{
+	winner = votes[0];
+	for (i = 1; i < votes.size; i++)
+	{
+		if (isDefined(votes[i]) && votes[i].value > winner.value)
+		{
+			winner = votes[i];
+		}
+	}
+
+	return winner;
+}
+
+/**
+ * Sets the map rotation for the map vote.
+ *
+ * @param mapid The ID of the map to be added to the rotation.
+ * @param gametype The game type associated with the map.
+ */
+MapvoteSetRotation(mapid, gametype)
+{
+	array = strTok(gametype, ";");
+	str = "";
+	if (array.size > 1)
+	{
+		str = "gametype " + array[0] + "; map " + mapid;
+	}
+	else
+	{
+		str = "map " + mapid; 
+	}
+
+	// Debug print
+	logPrint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
+
+	// Set the Dvars for map rotation
+	setdvar("g_gametype", array[0]);
+	setdvar("sv_currentmaprotation", str);
+	setdvar("sv_maprotationcurrent", str);
+	setdvar("sv_maprotation", str);
+
+	// Notify that the map rotation has been set
+	level notify("mv_ended");
+}
+
+/**
+ * This function displays the map voting UI on the server.
+ * It creates font strings and rectangles to display the map options and their corresponding game types.
+ * It also sets up a timer for the map voting duration.
+ * The function ends when the game ends or when the map voting time is up.
+ * @remarks Make sure to set the necessary dvars for the map voting UI to work properly.
+ */
+MapvoteServerUI()
+{
+	//level endon("game_ended");
+
+	buttons = level createServerFontString("objective", 1.6);
+	buttons setText("^3[{+speed_throw}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]");
+	buttons setPoint("center", "center", 0, 80);
+	buttons.hideWhenInMenu = 0;
+
+	mv_votecolor = getDvar("mv_votecolor");
+
+	textline1 = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + gametypeToDisplayName(strTok(level.mapvotedata["secondmap"].gametype, ";")[0]), "objective", 1.1, "center", "center", -220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+	textline2 = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + gametypeToDisplayName(strTok(level.mapvotedata["secondmap"].gametype, ";")[0]), "objective", 1.1, "center", "center", 0, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+	textline3 = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + gametypeToDisplayName(strTok(level.mapvotedata["thirdmap"].gametype, ";")[0]), "objective", 1.1, "center", "center", 220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+
+	textlinebackground1 = level CreateRectangle("center", "center", -220, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
+	textlinebackground2 = level CreateRectangle("center", "center", 0, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
+	textlinebackground3 = level CreateRectangle("center", "center", 220, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
+
+	level notify("mapvote_animate");
+	textline1 affectElement("y", 1.2, -6);
+	textline2 affectElement("y", 1.2, -6);
+	textline3 affectElement("y", 1.2, -6);
+	textlinebackground1 affectElement("alpha", 1.5, 0.8);
+	textlinebackground2 affectElement("alpha", 1.5, 0.8);
+	textlinebackground3 affectElement("alpha", 1.5, 0.8);
+
+	wait 1;
+	level notify("mapvote_start");
+
+	mv_sentence = getDvar("mv_sentence");
+	mv_socialname = getDvar("mv_socialname");
+	mv_sociallink = getDvar("mv_sociallink");
+	credits = level createServerFontString("objective", 1.2);
+	credits setPoint("center", "center", -200, 180);
+	credits setText(mv_sentence + "\nDeveloped by @^5DoktorSAS ^7\n" + mv_socialname + ": " + mv_sociallink);
+
+	timer = level createServerFontString("objective", 2);
+	timer setPoint("center", "center", 0, -140);
+	timer setTimer(level.mapvotedata["time"]);
+	wait level.mapvotedata["time"];
+	level notify("mapvote_end");
+	level notify("vote", -1);
+
+	credits affectElement("alpha", 0.5, 0);
+	buttons affectElement("alpha", 0.5, 0);
+	textline1 affectElement("alpha", 0.5, 0);
+	textline2 affectElement("alpha", 0.5, 0);
+	textline3 affectElement("alpha", 0.5, 0);
+	textlinebackground1 affectElement("alpha", 0.5, 0);
+	textlinebackground2 affectElement("alpha", 0.5, 0);
+	textlinebackground3 affectElement("alpha", 0.5, 0);
+	timer affectElement("alpha", 0.5, 0);
+
+	foreach (player in level.players)
+	{
+		player notify("mapvote_end");
+		player SetBlurForPlayer(0, 0);
+	}
+}
+
 // Utils
-maptoname(mapid)
+/**
+ * Removes an element from an array by its index.
+ * 
+ * @param array The array from which to remove the element.
+ * @param index The index of the element to be removed.
+ * @return The modified array with the element removed.
+ */
+ArrayRemoveByIndex(array, index)
+{
+	new_array = [];
+	for (i = 0; i < array.size; i++)
+	{
+		if (i != index)
+			new_array[new_array.size] = array[i];
+	}
+	array = new_array;
+	return new_array;
+}
+
+mapToDisplayName(mapid)
 {
 	mapid = tolower(mapid);
 	if (mapid == "mp_convoy") return "Ambush";
@@ -587,7 +695,7 @@ maptoname(mapid)
     if (mapid == "mp_bog_summer") return "Beach Bog";
     return mapid;
 }
-maptoloadscreen(mapid)
+mapidToLoadscreen(mapid)
 {
 	mapid = tolower(mapid);
 	return "loadscreen_" + mapid;
@@ -623,120 +731,179 @@ maptoloadscreen(mapid)
 	*/
     return mapid;
 }
+/**
+ * Sets the value of a dvar if it is not already initialized.
+ *
+ * @param dvar The name of the dvar.
+ * @param value The value to set the dvar to.
+ */
 SetDvarIfNotInizialized(dvar, value)
 {
 	if (!IsInizialized(dvar))
 		setDvar(dvar, value);
 }
+
+/**
+ * Checks if a dvar is initialized.
+ *
+ * @param dvar The name of the dvar.
+ * @returns True if the dvar is initialized, false otherwise.
+ */
 IsInizialized(dvar)
 {
 	result = getDvar(dvar);
 	return result != "";
 }
 
-gametypeToName(gametype)
+/**
+ * Converts a game type abbreviation to its corresponding display name.
+ * 
+ * @param {string} gametype - The game type abbreviation.
+ * @returns {string} - The display name of the game type.
+ */
+gametypeToDisplayName(gametype)
 {
 	switch (tolower(gametype))
 	{
-	case "dm":
-		return "Free for all";
-
-	case "war":
-		return "Team Deathmatch";
-
-	case "sd":
-		return "Search & Destroy";
-
-	case "conf":
-		return "Kill Confirmed";
-
-	case "ctf":
-		return "Capture the Flag";
-
-	case "dom":
-		return "Domination";
-
-	case "dem":
-		return "Demolition";
-
-	case "gun":
-		return "Gun Game";
-
-	case "hq":
-		return "Headquaters";
-
-	case "koth":
-		return "Hardpoint";
-
-	case "oic":
-		return "One in the chamber";
-
-	case "oneflag":
-		return "One-Flag CTF";
-
-	case "sas":
-		return "Sticks & Stones";
-
-	case "shrp":
-		return "Sharpshooter";
+		case "dm":
+			return "Free for all";
+		case "war":
+			return "Team Deathmatch";
+		case "sd":
+			return "Search & Destroy";
+		case "conf":
+			return "Kill Confirmed";
+		case "ctf":
+			return "Capture the Flag";
+		case "dom":
+			return "Domination";
+		case "dem":
+			return "Demolition";
+		case "gun":
+			return "Gun Game";
+		case "hq":
+			return "Headquaters";
+		case "koth":
+			return "Hardpoint";
+		case "oic":
+			return "One in the chamber";
+		case "oneflag":
+			return "One-Flag CTF";
+		case "sas":
+			return "Sticks & Stones";
+		case "shrp":
+			return "Sharpshooter";
 	}
 	return "invalid";
 }
 
-// UI Utils
-isValidColor(value)
+/**
+ * Checks if a player is a bot.
+ * 
+ * @param entity The player entity to check.
+ * @returns True if the player is a bot, false otherwise.
+ */
+is_bot(entity)
+{
+	return isDefined(entity.pers["isBot"]) && entity.pers["isBot"];
+}
+
+/*
+ *	Functions to create/manage HUD and UI elements/objects/structures/components
+ *	Functions:
+ *		- CreateString(input, font, fontScale, align, relative, x, y, color, alpha, glowColor, glowAlpha, sort, isLevel)
+ *		- CreateRectangle(align, relative, x, y, width, height, color, shader, sort, alpha, islevel)
+ *		- CreateImage(align, relative, x, y, width, height, image, sort, alpha, islevel)
+ *		- ValidateColor(value)
+ *		- GetColor(color)
+
+*/
+
+/**
+ * Validates a color value.
+ * 
+ * @param value - The color value to validate.
+ * @returns True if the value is a valid color (0-7), false otherwise.
+ */
+ValidateColor(value)
 {
 	return value == "0" || value == "1" || value == "2" || value == "3" || value == "4" || value == "5" || value == "6" || value == "7";
 }
+
+/**
+ * GetColor function returns the RGB values of a given color name.
+ * 
+ * @param {string} color - The name of the color.
+ * @returns {array} - An array containing the RGB values of the color.
+ */
 GetColor(color)
 {
 	switch (tolower(color))
 	{
-	case "red":
-		return (0.960, 0.180, 0.180);
+		case "red":
+			return (0.960, 0.180, 0.180);
 
-	case "black":
-		return (0, 0, 0);
+		case "black":
+			return (0, 0, 0);
 
-	case "grey":
-		return (0.035, 0.059, 0.063);
+		case "grey":
+			return (0.035, 0.059, 0.063);
 
-	case "purple":
-		return (1, 0.282, 1);
+		case "purple":
+			return (1, 0.282, 1);
 
-	case "pink":
-		return (1, 0.623, 0.811);
+		case "pink":
+			return (1, 0.623, 0.811);
 
-	case "green":
-		return (0, 0.69, 0.15);
+		case "green":
+			return (0, 0.69, 0.15);
 
-	case "blue":
-		return (0, 0, 1);
+		case "blue":
+			return (0, 0, 1);
 
-	case "lightblue":
-	case "light blue":
-		return (0.152, 0329, 0.929);
+		case "lightblue":
+		case "light blue":
+			return (0.152, 0329, 0.929);
 
-	case "lightgreen":
-	case "light green":
-		return (0.09, 1, 0.09);
+		case "lightgreen":
+		case "light green":
+			return (0.09, 1, 0.09);
 
-	case "orange":
-		return (1, 0662, 0.035);
+		case "orange":
+			return (1, 0662, 0.035);
 
-	case "yellow":
-		return (0.968, 0.992, 0.043);
+		case "yellow":
+			return (0.968, 0.992, 0.043);
 
-	case "brown":
-		return (0.501, 0.250, 0);
+		case "brown":
+			return (0.501, 0.250, 0);
 
-	case "cyan":
-		return (0, 1, 1);
+		case "cyan":
+			return (0, 1, 1);
 
-	case "white":
-		return (1, 1, 1);
+		case "white":
+			return (1, 1, 1);
 	}
 }
+
+/**
+ * Creates a font string with the specified properties.
+ *
+ * @param {string} input - The text to be displayed.
+ * @param {string} font - The font to be used.
+ * @param {float} fontScale - The scale of the font.
+ * @param {int} align - The alignment of the text.
+ * @param {int} relative - The relative position of the text.
+ * @param {float} x - The x-coordinate of the text.
+ * @param {float} y - The y-coordinate of the text.
+ * @param {vector} color - The color of the text.
+ * @param {float} alpha - The transparency of the text.
+ * @param {vector} glowColor - The color of the text glow.
+ * @param {float} glowAlpha - The transparency of the text glow.
+ * @param {int} sort - The sorting order of the text.
+ * @param {bool} isLevel - Indicates if the font string is created at the level or entity scope.
+ * @returns {hud} The created font string.
+ */
 CreateString(input, font, fontScale, align, relative, x, y, color, alpha, glowColor, glowAlpha, sort, isLevel)
 {
 	if (!isDefined(isLevel))
@@ -764,6 +931,23 @@ CreateString(input, font, fontScale, align, relative, x, y, color, alpha, glowCo
 	hud.hideWhenInMenu = 0;
 	return hud;
 }
+
+/**
+ * Creates a rectangle HUD element.
+ *
+ * @param {string} align - The alignment of the rectangle.
+ * @param {bool} relative - Whether the position is relative to the parent element.
+ * @param {float} x - The x-coordinate of the rectangle.
+ * @param {float} y - The y-coordinate of the rectangle.
+ * @param {float} width - The width of the rectangle.
+ * @param {float} height - The height of the rectangle.
+ * @param {vector} color - The color of the rectangle.
+ * @param {string} shader - The shader applied to the rectangle.
+ * @param {int} sort - The sorting order of the rectangle.
+ * @param {float} alpha - The transparency of the rectangle.
+ * @param {bool} isLevel - Whether the rectangle is a level element.
+ * @returns {hudelem} The created rectangle HUD element.
+ */
 CreateRectangle(align, relative, x, y, width, height, color, shader, sort, alpha, islevel)
 {
 	if (isDefined(isLevel))
@@ -792,46 +976,12 @@ CreateRectangle(align, relative, x, y, width, height, color, shader, sort, alpha
 	return boxElem;
 }
 
-DrawText(text, font, fontscale, x, y, color, alpha, glowcolor, glowalpha, sort)
-{
-	hud = self createfontstring(font, fontscale);
-	hud setText(text);
-	hud.x = x;
-	hud.y = y;
-	hud.color = color;
-	hud.alpha = alpha;
-	hud.glowcolor = glowcolor;
-	hud.glowalpha = glowalpha;
-	hud.sort = sort;
-	hud.alpha = alpha;
-	hud.hideWhenInMenu = 0;
-	hud.archived = 0;
-	return hud;
-}
-DrawShader(shader, x, y, width, height, color, alpha, sort, align, relative, isLevel)
-{
-	if (isDefined(isLevel))
-		hud = newhudelem();
-	else
-		hud = newclienthudelem(self);
-	hud.elemtype = "icon";
-	hud.color = color;
-	hud.alpha = alpha;
-	hud.sort = sort;
-	hud.children = [];
-	if (isDefined(align))
-		hud.align = align;
-	if (isDefined(relative))
-		hud.relative = relative;
-	hud setparent(level.uiparent);
-	hud.x = x;
-	hud.y = y;
-	hud setshader(shader, width, height);
-	hud.hideWhenInMenu = 0;
-	hud.archived = 0;
-	return hud;
-}
-// UI Animations
+/**
+ * A function that applies an effect to an element over a specified time.
+ * @param {string} type - The type of effect to apply ("x", "y", "alpha", "color").
+ * @param {number} time - The duration of the effect in milliseconds.
+ * @param {number} value - The value to set for the effect.
+ */
 affectElement(type, time, value)
 {
 	if (type == "x" || type == "y")
