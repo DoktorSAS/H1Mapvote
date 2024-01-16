@@ -28,9 +28,10 @@ init()
 	{
 		level.mapvote_started = 1;
 
-		mapsIDs = [];
-		mapsIDs = strTok(getDvar("mv_maps"), " ");
-		mapschoosed = MapvoteChooseRandomMapsSelection(mapsIDs);
+		mapsIDsList = [];
+		mapsIDsList = strTok(getDvar("mv_maps"), " ");
+		mapschoosed = [];
+		mapschoosed = MapvoteChooseRandomMapsSelection(mapsIDsList);
 
 		level.mapvotedata["firstmap"] = spawnStruct();
 		level.mapvotedata["secondmap"] = spawnStruct();
@@ -207,7 +208,7 @@ FixBlur()
  *  - CallMapvote()
  *  - MapvoteConfig()
  *  - ExecuteMapvote()
- *  - MapvoteChooseRandomMapsSelection(mapsIDs)
+ *  - MapvoteChooseRandomMapsSelection(mapsIDsList)
  *  - MapvotePlayerUI()
  *  - destroyBoxes(boxes)
  *  - MapvoteForceFixedAngle()
@@ -246,8 +247,8 @@ MapvoteConfig()
 	level.mapvotedata = [];
 	SetDvarIfNotInizialized("mv_time", 20);
 	level.mapvotedata["time"] = getDvarInt("mv_time");
+	
 	SetDvarIfNotInizialized("mv_maps", "mp_convoy mp_backlot mp_bog mp_crash mp_crossfire mp_citystreets mp_farm mp_overgrown mp_shipment mp_vacant mp_broadcast mp_carentan mp_countdown mp_bloc mp_creek mp_killhouse mp_pipeline mp_strike mp_showdown mp_cargoship mp_crash_snow mp_farm_spring mp_bog_summer");
-
 	SetDvarIfNotInizialized("mv_credits", 1);
 	SetDvarIfNotInizialized("mv_socialsmv_socials", 1);
 	SetDvarIfNotInizialized("mv_socialname", "Website");
@@ -289,17 +290,25 @@ ExecuteMapvote()
 /**
  * Selects random maps from the given list.
  * 
- * @param mapsIDs - The array of map IDs to choose from.
+ * @param mapsIDsList - The array of map IDs to choose from.
  * @returns An array of randomly selected map IDs.
  */
-MapvoteChooseRandomMapsSelection(mapsIDs)
+MapvoteChooseRandomMapsSelection(mapsIDsList)
 {
 	mapschoosed = [];
 	for (i = 0; i < 3; i++)
 	{
-		index = randomIntRange(0, mapsIDs.size);
-		map = mapsIDs[index];
-		mapsIDs = ArrayRemoveByIndex(mapsIDs, map);
+		index = randomIntRange(0, mapsIDsList.size);
+		map = mapsIDsList[index];
+		//mapsIDsList = ArrayRemoveByIndex(mapsIDsList, index);
+
+		size = mapsIDsList.size;
+		for (j = index; j < mapsIDsList.size-1; j++)
+		{
+			mapsIDsList[j] = mapsIDsList[j+1];
+		}
+		mapsIDsList[size] = undefined;
+
 		mapschoosed[i] = map;
 	}
 
@@ -656,14 +665,14 @@ MapvoteServerUI()
  */
 ArrayRemoveByIndex(array, index)
 {
-	new_array = [];
-	for (i = 0; i < array.size; i++)
+	size = array.size;
+	
+	for (i = index; i < array.size-1; i++)
 	{
-		if (i != index)
-			new_array[new_array.size] = array[i];
+		array[i] = array[i+1];
 	}
-	array = new_array;
-	return new_array;
+	array[size] = undefined;
+	return array;
 }
 
 mapToDisplayName(mapid)
