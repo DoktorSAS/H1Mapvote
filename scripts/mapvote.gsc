@@ -675,42 +675,55 @@ ArrayRemoveByIndex(array, index)
 	return array;
 }
 
+/**
+ * Converts a map ID to its corresponding display name.
+ * 
+ * @param {string} mapid - The map ID to convert.
+ * @returns {string} - The display name of the map.
+ */
 mapToDisplayName(mapid)
 {
 	mapid = tolower(mapid);
-	if (mapid == "mp_convoy") return "Ambush";
-    if (mapid == "mp_backlot") return "Backlot";
-    if (mapid == "mp_bog") return "Bog";
-    if (mapid == "mp_crash") return "Crash";
-    if (mapid == "mp_crossfire") return "Crossfire";
-    if (mapid == "mp_citystreets") return "District";
-    if (mapid == "mp_farm") return "Downpour";
-    if (mapid == "mp_overgrown") return "Overgrown";
-    if (mapid == "mp_shipment") return "Shipment";
-    if (mapid == "mp_vacant") return "Vacant";
-    if (mapid == "mp_vlobby_room") return "Lobby Map";
-    if (mapid == "mp_broadcast") return "Broadcast";
-    if (mapid == "mp_carentan") return "Chinatown";
-    if (mapid == "mp_countdown") return "Countdown";
-    if (mapid == "mp_bloc") return "Bloc";
-    if (mapid == "mp_creek") return "Creek";
-    if (mapid == "mp_killhouse") return "Killhouse";
-    if (mapid == "mp_pipeline") return "Pipeline";
-    if (mapid == "mp_strike") return "Strike";
-    if (mapid == "mp_showdown") return "Showdown";
-    if (mapid == "mp_cargoship") return "Wet Work";
-    if (mapid == "mp_crash_snow") return "Winter Crash";
-    if (mapid == "mp_farm_spring") return "Day Break";
-    if (mapid == "mp_bog_summer") return "Beach Bog";
-    return mapid;
+	switch (mapid) {
+        case "mp_convoy": return "Ambush";
+        case "mp_backlot": return "Backlot";
+        case "mp_bog": return "Bog";
+        case "mp_crash": return "Crash";
+        case "mp_crossfire": return "Crossfire";
+        case "mp_citystreets": return "District";
+        case "mp_farm": return "Downpour";
+        case "mp_overgrown": return "Overgrown";
+        case "mp_shipment": return "Shipment";
+        case "mp_vacant": return "Vacant";
+        case "mp_vlobby_room": return "Lobby Map";
+        case "mp_broadcast": return "Broadcast";
+        case "mp_carentan": return "Chinatown";
+        case "mp_countdown": return "Countdown";
+        case "mp_bloc": return "Bloc";
+        case "mp_creek": return "Creek";
+        case "mp_killhouse": return "Killhouse";
+        case "mp_pipeline": return "Pipeline";
+        case "mp_strike": return "Strike";
+        case "mp_showdown": return "Showdown";
+        case "mp_cargoship": return "Wet Work";
+        case "mp_crash_snow": return "Winter Crash";
+        case "mp_farm_spring": return "Day Break";
+        case "mp_bog_summer": return "Beach Bog";
+        default:
+            return mapid;
+    }
 }
+/**
+ * Returns the loadscreen name for a given map ID.
+ * @param {string} mapid - The map ID.
+ * @returns {string} - The loadscreen name for the map.
+ */
 mapidToLoadscreen(mapid)
 {
 	mapid = tolower(mapid);
 	return "loadscreen_" + mapid;
 
- 	
-	/*	
+ 	/*	
 		If there are maps that have unconventional file names, use an if case and change the return value to the appropriate one.
 
 		if (mapid == "mp_convoy") return "loadscreen_mp_convoy";
