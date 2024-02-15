@@ -563,22 +563,29 @@ MapvoteGetMostVotedMap(votes)
  */
 MapvoteSetRotation(mapid, gametype)
 {
-	array = strTok(gametype, ";");
-	str = "";
-	if (array.size > 1)
+	str = "map " + mapid; 
+	if(isDefined(gametype))
 	{
-		str = "gametype " + array[0] + "; map " + mapid;
-	}
-	else
-	{
-		str = "map " + mapid; 
+		array = strTok(gametype, ";");
+		if (array.size > 1)
+		{
+			setdvar("g_gametype", array[0]);
+			str = "gametype " + array[0] + "; map " + mapid;
+			// Debug print
+			logPrint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
+		}
+		else
+		{
+			setdvar("g_gametype", gametype);
+			// Debug print
+			logPrint("mapvote//gametype//" + gametype + "//executing//" + str + "\n");
+		}
 	}
 
-	// Debug print
-	logPrint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
+
 
 	// Set the Dvars for map rotation
-	setdvar("g_gametype", array[0]);
+	
 	setdvar("sv_currentmaprotation", str);
 	setdvar("sv_maprotationcurrent", str);
 	setdvar("sv_maprotation", str);
