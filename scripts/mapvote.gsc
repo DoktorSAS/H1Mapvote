@@ -34,6 +34,9 @@ init()
 	{
 		level.mapvote_started = 1;
 
+		gametypesIDsList = strTok(getDvar("mv_gametypes"), " ");
+		gametypes = MapvoteChooseRandomGametypesSelection(mapsIDsList, times);
+
 		mapsIDsList = [];
 		mapsIDsList = strTok(getDvar("mv_maps"), " ");
 		mapschoosed = [];
@@ -45,30 +48,23 @@ init()
 
 		level.mapvotedata["firstmap"].mapname = mapToDisplayName(mapschoosed[0]);
 		level.mapvotedata["firstmap"].mapid = mapschoosed[0];
+		level.mapvotedata["firstmap"].gametype = gametypes[0];
 		level.mapvotedata["firstmap"].gametypename = gametypeToName(strTok(level.mapvotedata["firstmap"].gametype, ";")[0]);
-		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[0]);
+		// level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[0]);
 		level.mapvotedata["secondmap"].mapname = mapToDisplayName(mapschoosed[1]);
 		level.mapvotedata["secondmap"].mapid = mapschoosed[1];
+		level.mapvotedata["secondmap"].gametype = gametypes[1];
 		level.mapvotedata["secondmap"].gametypename = gametypeToName(strTok(level.mapvotedata["secondmap"].gametype, ";")[0]);
-		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[1]);
+		// level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[1]);
 		level.mapvotedata["thirdmap"].mapname = mapToDisplayName(mapschoosed[2]);
 		level.mapvotedata["thirdmap"].mapid = mapschoosed[2];
+		level.mapvotedata["thirdmap"].gametype = gametypes[2];
 		level.mapvotedata["thirdmap"].gametypename = gametypeToName(strTok(level.mapvotedata["thirdmap"].gametype, ";")[0]);
-		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[2]);
+		// level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[2]);
 
-		//preCacheShader(level.mapvotedata["firstmap"].loadscreen);
-		//preCacheShader(level.mapvotedata["secondmap"].loadscreen);
-		//preCacheShader(level.mapvotedata["thirdmap"].loadscreen);
-
-		gametypesIDsList = strTok(getDvar("mv_gametypes"), " ");
-		gametypes = MapvoteChooseRandomGametypesSelection(mapsIDsList, times);
-		g1 = gametypes[0];
-		g2 = gametypes[1];
-		g3 = gametypes[2];
-
-		level.mapvotedata["firstmap"].gametype = g1;
-		level.mapvotedata["secondmap"].gametype = g2;
-		level.mapvotedata["thirdmap"].gametype = g3;
+		// preCacheShader(level.mapvotedata["firstmap"].loadscreen);
+		// preCacheShader(level.mapvotedata["secondmap"].loadscreen);
+		// preCacheShader(level.mapvotedata["thirdmap"].loadscreen);
 
 		if (GetDvarInt("mv_randomoption") == 1)
 		{
@@ -92,114 +88,113 @@ init()
 
 main()
 {
-	replacefunc( maps\mp\gametypes\_gamelogic::waittillfinalkillcamdone, ::waittillfinalkillcamdone);
-	if(getDvar("g_gametype") == "sd" || getDvar("g_gametype") == "sr") 
+	replacefunc(maps\mp\gametypes\_gamelogic::waittillfinalkillcamdone, ::waittillfinalkillcamdone);
+	if (getDvar("g_gametype") == "sd" || getDvar("g_gametype") == "sr")
 	{
-		replacefunc( maps\mp\gametypes\_damage::erasefinalkillcam, ::erasefinalkillcam);
+		replacefunc(maps\mp\gametypes\_damage::erasefinalkillcam, ::erasefinalkillcam);
 	}
 }
 
 erasefinalkillcam()
 {
-    if ( level.multiteambased )
-    {
-        for ( var_0 = 0; var_0 < level.teamnamelist.size; var_0++ )
-        {
-            level.finalkillcam_delay[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_victim[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_attacker[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_attackernum[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_killcamentityindex[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_killcamentitystarttime[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_sweapon[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_weaponindex[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_customindex[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_isalternate[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_deathtimeoffset[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_psoffsettime[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_timerecorded[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_timegameended[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_smeansofdeath[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_type[level.teamnamelist[var_0]] = undefined;
-            level.finalkillcam_usestarttime[level.teamnamelist[var_0]] = undefined;
-        }
-    }
-    else
-    {
-        level.finalkillcam_delay["axis"] = undefined;
-        level.finalkillcam_victim["axis"] = undefined;
-        level.finalkillcam_attacker["axis"] = undefined;
-        level.finalkillcam_attackernum["axis"] = undefined;
-        level.finalkillcam_killcamentityindex["axis"] = undefined;
-        level.finalkillcam_killcamentitystarttime["axis"] = undefined;
-        level.finalkillcam_sweapon["axis"] = undefined;
-        level.finalkillcam_weaponindex["axis"] = undefined;
-        level.finalkillcam_customindex["axis"] = undefined;
-        level.finalkillcam_isalternate["axis"] = undefined;
-        level.finalkillcam_deathtimeoffset["axis"] = undefined;
-        level.finalkillcam_psoffsettime["axis"] = undefined;
-        level.finalkillcam_timerecorded["axis"] = undefined;
-        level.finalkillcam_timegameended["axis"] = undefined;
-        level.finalkillcam_smeansofdeath["axis"] = undefined;
-        level.finalkillcam_type["axis"] = undefined;
-        level.finalkillcam_usestarttime["axis"] = undefined;
-        level.finalkillcam_delay["allies"] = undefined;
-        level.finalkillcam_victim["allies"] = undefined;
-        level.finalkillcam_attacker["allies"] = undefined;
-        level.finalkillcam_attackernum["allies"] = undefined;
-        level.finalkillcam_killcamentityindex["allies"] = undefined;
-        level.finalkillcam_killcamentitystarttime["allies"] = undefined;
-        level.finalkillcam_sweapon["allies"] = undefined;
-        level.finalkillcam_weaponindex["allies"] = undefined;
-        level.finalkillcam_customindex["allies"] = undefined;
-        level.finalkillcam_isalternate["allies"] = undefined;
-        level.finalkillcam_deathtimeoffset["allies"] = undefined;
-        level.finalkillcam_psoffsettime["allies"] = undefined;
-        level.finalkillcam_timerecorded["allies"] = undefined;
-        level.finalkillcam_timegameended["allies"] = undefined;
-        level.finalkillcam_smeansofdeath["allies"] = undefined;
-        level.finalkillcam_type["allies"] = undefined;
-        level.finalkillcam_usestarttime["allies"] = undefined;
-    }
+	if (level.multiteambased)
+	{
+		for (var_0 = 0; var_0 < level.teamnamelist.size; var_0++)
+		{
+			level.finalkillcam_delay[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_victim[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_attacker[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_attackernum[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_killcamentityindex[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_killcamentitystarttime[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_sweapon[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_weaponindex[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_customindex[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_isalternate[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_deathtimeoffset[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_psoffsettime[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_timerecorded[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_timegameended[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_smeansofdeath[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_type[level.teamnamelist[var_0]] = undefined;
+			level.finalkillcam_usestarttime[level.teamnamelist[var_0]] = undefined;
+		}
+	}
+	else
+	{
+		level.finalkillcam_delay["axis"] = undefined;
+		level.finalkillcam_victim["axis"] = undefined;
+		level.finalkillcam_attacker["axis"] = undefined;
+		level.finalkillcam_attackernum["axis"] = undefined;
+		level.finalkillcam_killcamentityindex["axis"] = undefined;
+		level.finalkillcam_killcamentitystarttime["axis"] = undefined;
+		level.finalkillcam_sweapon["axis"] = undefined;
+		level.finalkillcam_weaponindex["axis"] = undefined;
+		level.finalkillcam_customindex["axis"] = undefined;
+		level.finalkillcam_isalternate["axis"] = undefined;
+		level.finalkillcam_deathtimeoffset["axis"] = undefined;
+		level.finalkillcam_psoffsettime["axis"] = undefined;
+		level.finalkillcam_timerecorded["axis"] = undefined;
+		level.finalkillcam_timegameended["axis"] = undefined;
+		level.finalkillcam_smeansofdeath["axis"] = undefined;
+		level.finalkillcam_type["axis"] = undefined;
+		level.finalkillcam_usestarttime["axis"] = undefined;
+		level.finalkillcam_delay["allies"] = undefined;
+		level.finalkillcam_victim["allies"] = undefined;
+		level.finalkillcam_attacker["allies"] = undefined;
+		level.finalkillcam_attackernum["allies"] = undefined;
+		level.finalkillcam_killcamentityindex["allies"] = undefined;
+		level.finalkillcam_killcamentitystarttime["allies"] = undefined;
+		level.finalkillcam_sweapon["allies"] = undefined;
+		level.finalkillcam_weaponindex["allies"] = undefined;
+		level.finalkillcam_customindex["allies"] = undefined;
+		level.finalkillcam_isalternate["allies"] = undefined;
+		level.finalkillcam_deathtimeoffset["allies"] = undefined;
+		level.finalkillcam_psoffsettime["allies"] = undefined;
+		level.finalkillcam_timerecorded["allies"] = undefined;
+		level.finalkillcam_timegameended["allies"] = undefined;
+		level.finalkillcam_smeansofdeath["allies"] = undefined;
+		level.finalkillcam_type["allies"] = undefined;
+		level.finalkillcam_usestarttime["allies"] = undefined;
+	}
 
-    level.finalkillcam_delay["none"] = undefined;
-    level.finalkillcam_victim["none"] = undefined;
-    level.finalkillcam_attacker["none"] = undefined;
-    level.finalkillcam_attackernum["none"] = undefined;
-    level.finalkillcam_killcamentityindex["none"] = undefined;
-    level.finalkillcam_killcamentitystarttime["none"] = undefined;
-    level.finalkillcam_sweapon["none"] = undefined;
-    level.finalkillcam_weaponindex["none"] = undefined;
-    level.finalkillcam_customindex["none"] = undefined;
-    level.finalkillcam_isalternate["none"] = undefined;
-    level.finalkillcam_deathtimeoffset["none"] = undefined;
-    level.finalkillcam_psoffsettime["none"] = undefined;
-    level.finalkillcam_timerecorded["none"] = undefined;
-    level.finalkillcam_timegameended["none"] = undefined;
-    level.finalkillcam_smeansofdeath["none"] = undefined;
-    level.finalkillcam_type["none"] = undefined;
-    level.finalkillcam_usestarttime["none"] = undefined;
-    level.finalkillcam_winner = undefined;
-    if (waslastround())
-    {
-        [[level.CallMapvote]]();
-    }
+	level.finalkillcam_delay["none"] = undefined;
+	level.finalkillcam_victim["none"] = undefined;
+	level.finalkillcam_attacker["none"] = undefined;
+	level.finalkillcam_attackernum["none"] = undefined;
+	level.finalkillcam_killcamentityindex["none"] = undefined;
+	level.finalkillcam_killcamentitystarttime["none"] = undefined;
+	level.finalkillcam_sweapon["none"] = undefined;
+	level.finalkillcam_weaponindex["none"] = undefined;
+	level.finalkillcam_customindex["none"] = undefined;
+	level.finalkillcam_isalternate["none"] = undefined;
+	level.finalkillcam_deathtimeoffset["none"] = undefined;
+	level.finalkillcam_psoffsettime["none"] = undefined;
+	level.finalkillcam_timerecorded["none"] = undefined;
+	level.finalkillcam_timegameended["none"] = undefined;
+	level.finalkillcam_smeansofdeath["none"] = undefined;
+	level.finalkillcam_type["none"] = undefined;
+	level.finalkillcam_usestarttime["none"] = undefined;
+	level.finalkillcam_winner = undefined;
+	if (waslastround())
+	{
+		[[level.CallMapvote]] ();
+	}
 }
 
 waittillfinalkillcamdone()
 {
-    if ( !isdefined( level.finalkillcam_winner ) )
-        return 0;
+	if (!isdefined(level.finalkillcam_winner))
+		return 0;
 
-    level waittill( "final_killcam_done" );
-    if (waslastround())
-    {
-        [[level.CallMapvote]]();
-    }
+	level waittill("final_killcam_done");
+	if (waslastround())
+	{
+		[[level.CallMapvote]] ();
+	}
 
-    return 1;
+	return 1;
 }
-
 
 /**
  * This script handles the blur effect fix for players when they connect to the game.
@@ -248,7 +243,7 @@ FixBlur()
  *  - mapToDisplayName(mapid)
  *  - mapidToLoadscreen(mapid)
  *  - gametypeToDisplayName(gametype)
-*/
+ */
 
 /**
  * Calls the map vote function if it is the last round.
@@ -268,12 +263,12 @@ MapvoteConfig()
 {
 	SetDvarIfNotInizialized("mv_enable", 1);
 	if (getDvarInt("mv_enable") != 1) // Check if mapvote is enable
-		return; // End if the mapvote its not enable
+		return;						  // End if the mapvote its not enable
 
 	level.mapvotedata = [];
 	SetDvarIfNotInizialized("mv_time", 20);
 	level.mapvotedata["time"] = getDvarInt("mv_time");
-	
+
 	SetDvarIfNotInizialized("mv_maps", "mp_convoy mp_backlot mp_bog mp_crash mp_crossfire mp_citystreets mp_farm mp_overgrown mp_shipment mp_vacant mp_broadcast mp_carentan mp_countdown mp_bloc mp_creek mp_killhouse mp_pipeline mp_strike mp_showdown mp_cargoship mp_crash_snow mp_farm_spring mp_bog_summer");
 	SetDvarIfNotInizialized("mv_credits", 1);
 	SetDvarIfNotInizialized("mv_socialname", "Website");
@@ -311,7 +306,7 @@ ExecuteMapvote()
 			if (!is_bot(player))
 				player thread MapvotePlayerUI();
 		}
-		
+
 		waittillframeend;
 
 		level thread MapvoteServerUI();
@@ -326,25 +321,25 @@ ExecuteMapvote()
  * @param todelete The element to be removed from the array.
  * @return The new array without the specified element.
  */
- ArrayRemoveElement(array, todelete)
- {
-	 newarray = [];
-	 once = 0;
-	 for (i = 0; i < array.size; i++)
-	 {
-		 element = array[i];
-		 if (element == todelete && !once)
-		 {
-			 once = 1;
-		 }
-		 else
-		 {
-			 printf(element);
-			 newarray[newarray.size] = element;
-		 }
-	 }
-	 return newarray;
- }
+ArrayRemoveElement(array, todelete)
+{
+	newarray = [];
+	once = 0;
+	for (i = 0; i < array.size; i++)
+	{
+		element = array[i];
+		if (element == todelete && !once)
+		{
+			once = 1;
+		}
+		else
+		{
+			printf(element);
+			newarray[newarray.size] = element;
+		}
+	}
+	return newarray;
+}
 /**
  * Selects random maps from the given list.
  *
@@ -352,55 +347,55 @@ ExecuteMapvote()
  * @param times - The number of maps to select.
  * @return An array containing the randomly selected maps.
  */
- MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from the list
- {
-	 mapschoosed = [];
-	 for (i = 0; i < times; i++)
-	 {
-		 index = randomIntRange(0, mapsIDsList.size);
-		 map = mapsIDsList[index];
-		 mapschoosed[i] = map;
-		 logPrint("map;" + map + ";index;" + index + "\n");
-		 if (GetDvarInt("mv_maps_norepeat"))
-		 {
-			 printf("mv_maps");
-			 mapsIDsList = ArrayRemoveElement(mapsIDsList, map);
-		 }
-		 // arrayremovevalue(mapsIDsList , map);
-	 }
- 
-	 return mapschoosed;
- }
- 
- /**
-  * Selects random gametypes from the given list.
-  *
-  * @param gametypesIDsList - The list of gametypes IDs to choose from.
-  * @param times - The number of maps to select.
-  * @return An array containing the randomly selected maps.
-  */
- MapvoteChooseRandomGametypesSelection(gametypesIDsList, times) // Select random map from the list
- {
-	 gametypeschoosed = [];
-	 for (i = 0; i < times; i++)
-	 {
-		 index = randomIntRange(0, gametypesIDsList.size);
-		 gametype = gametypesIDsList[index];
-		 gametypeschoosed[i] = gametype;
-		 if (GetDvarInt("mv_gametypes_norepeat"))
-		 {
-			 printf("mv_gametypes");
-			 gametypesIDsList = ArrayRemoveElement(gametypesIDsList, gametype);
-		 }
-		 // arrayremovevalue(mapsIDsList , map);
-	 }
- 
-	 return gametypeschoosed;
- }
+MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from the list
+{
+	mapschoosed = [];
+	for (i = 0; i < times; i++)
+	{
+		index = randomIntRange(0, mapsIDsList.size);
+		map = mapsIDsList[index];
+		mapschoosed[i] = map;
+		logPrint("map;" + map + ";index;" + index + "\n");
+		if (GetDvarInt("mv_maps_norepeat"))
+		{
+			printf("mv_maps");
+			mapsIDsList = ArrayRemoveElement(mapsIDsList, map);
+		}
+		// arrayremovevalue(mapsIDsList , map);
+	}
+
+	return mapschoosed;
+}
+
+/**
+ * Selects random gametypes from the given list.
+ *
+ * @param gametypesIDsList - The list of gametypes IDs to choose from.
+ * @param times - The number of maps to select.
+ * @return An array containing the randomly selected maps.
+ */
+MapvoteChooseRandomGametypesSelection(gametypesIDsList, times) // Select random map from the list
+{
+	gametypeschoosed = [];
+	for (i = 0; i < times; i++)
+	{
+		index = randomIntRange(0, gametypesIDsList.size);
+		gametype = gametypesIDsList[index];
+		gametypeschoosed[i] = gametype;
+		if (GetDvarInt("mv_gametypes_norepeat"))
+		{
+			printf("mv_gametypes");
+			gametypesIDsList = ArrayRemoveElement(gametypesIDsList, gametype);
+		}
+		// arrayremovevalue(mapsIDsList , map);
+	}
+
+	return gametypeschoosed;
+}
 
 /**
  * Displays the map voting UI for players.
- * 
+ *
  * This function creates three rectangles representing the map voting options.
  * It handles player input for navigating and selecting map options.
  * The selected map option is highlighted with a different color.
@@ -413,7 +408,7 @@ MapvotePlayerUI()
 
 	/**
 	 * Sets the scroll color and background color based on the values of the "mv_scrollcolor" and "mv_backgroundcolor" dvars.
-	 * 
+	 *
 	 * @param scrollcolor The color for the scroll.
 	 * @param bgcolor The background color.
 	 */
@@ -470,7 +465,7 @@ MapvotePlayerUI()
 		if (command == "select")
 		{
 			self.statusicon = "compass_icon_vf_active"; // Green dot
-			if(previuesindex >= 0)
+			if (previuesindex >= 0)
 			{
 				select_color = getColor(getDvar("mv_selectcolor"));
 				boxes[previuesindex] affectElement("color", 0.2, bgcolor);
@@ -482,7 +477,7 @@ MapvotePlayerUI()
 
 			select_color = getColor(getDvar("mv_selectcolor"));
 			boxes[index] affectElement("color", 0.2, select_color);
-			if( GetDvarInt("mv_allowchangevote", 1) == 0)
+			if (GetDvarInt("mv_allowchangevote", 1) == 0)
 			{
 				voting = 0;
 			}
@@ -536,7 +531,7 @@ MapvoteForceFixedAngle()
 
 /**
  * Creates a vote display area at the specified coordinates.
- * 
+ *
  * @param x The x-coordinate of the display area.
  * @param y The y-coordinate of the display area.
  * @return The created display area.
@@ -554,7 +549,7 @@ CreateVoteDisplay(x, y)
 }
 /**
  * Creates a vote display object with the specified coordinates and map.
- * 
+ *
  * @param x The x-coordinate of the display object.
  * @param y The y-coordinate of the display object.
  * @param map The map associated with the display object.
@@ -595,7 +590,7 @@ MapvoteHandler()
 		*/
 		level waittill("vote", index, value);
 
-		if(index == -1) 
+		if (index == -1)
 		{
 			voting = false;
 
@@ -646,8 +641,8 @@ MapvoteGetMostVotedMap(votes)
  */
 MapvoteSetRotation(mapid, gametype)
 {
-	str = "map " + mapid; 
-	if(isDefined(gametype))
+	str = "map " + mapid;
+	if (isDefined(gametype))
 	{
 		array = strTok(gametype, ";");
 		if (array.size > 1)
@@ -665,7 +660,7 @@ MapvoteSetRotation(mapid, gametype)
 		}
 	}
 	// Set the Dvars for map rotation
-	
+
 	setdvar("sv_currentmaprotation", str);
 	setdvar("sv_maprotationcurrent", str);
 	setdvar("sv_maprotation", str);
@@ -683,7 +678,7 @@ MapvoteSetRotation(mapid, gametype)
  */
 MapvoteServerUI()
 {
-	//level endon("game_ended");
+	// level endon("game_ended");
 
 	buttons = level createServerFontString("objective", 1.6);
 	buttons setText("^3[{+speed_throw}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]");
@@ -759,7 +754,7 @@ _countPlayers()
 
 /**
  * Removes an element from an array by its index.
- * 
+ *
  * @param array The array from which to remove the element.
  * @param index The index of the element to be removed.
  * @return The modified array with the element removed.
@@ -767,10 +762,10 @@ _countPlayers()
 ArrayRemoveByIndex(array, index)
 {
 	size = array.size;
-	
-	for (i = index; i < array.size-1; i++)
+
+	for (i = index; i < array.size - 1; i++)
 	{
-		array[i] = array[i+1];
+		array[i] = array[i + 1];
 	}
 	array[size] = undefined;
 	return array;
@@ -778,42 +773,129 @@ ArrayRemoveByIndex(array, index)
 
 /**
  * Converts a map ID to its corresponding display name.
- * 
+ *
  * @param {string} mapid - The map ID to convert.
  * @returns {string} - The display name of the map.
  */
 mapToDisplayName(mapid)
 {
 	mapid = tolower(mapid);
-	switch (mapid) {
-        case "mp_convoy": return "Ambush";
-        case "mp_backlot": return "Backlot";
-        case "mp_bog": return "Bog";
-        case "mp_crash": return "Crash";
-        case "mp_crossfire": return "Crossfire";
-        case "mp_citystreets": return "District";
-        case "mp_farm": return "Downpour";
-        case "mp_overgrown": return "Overgrown";
-        case "mp_shipment": return "Shipment";
-        case "mp_vacant": return "Vacant";
-        case "mp_vlobby_room": return "Lobby Map";
-        case "mp_broadcast": return "Broadcast";
-        case "mp_carentan": return "Chinatown";
-        case "mp_countdown": return "Countdown";
-        case "mp_bloc": return "Bloc";
-        case "mp_creek": return "Creek";
-        case "mp_killhouse": return "Killhouse";
-        case "mp_pipeline": return "Pipeline";
-        case "mp_strike": return "Strike";
-        case "mp_showdown": return "Showdown";
-        case "mp_cargoship": return "Wet Work";
-        case "mp_crash_snow": return "Winter Crash";
-        case "mp_farm_spring": return "Day Break";
-        case "mp_bog_summer": return "Beach Bog";
-        default:
-            return mapid;
-    }
+	switch (mapid)
+	{
+	case "mp_convoy":
+		return "Ambush";
+	case "mp_backlot":
+		return "Backlot";
+	case "mp_bog":
+		return "Bog";
+	case "mp_crash":
+		return "Crash";
+	case "mp_crossfire":
+		return "Crossfire";
+	case "mp_citystreets":
+		return "District";
+	case "mp_farm":
+		return "Downpour";
+	case "mp_overgrown":
+		return "Overgrown";
+	case "mp_shipment":
+		return "Shipment";
+	case "mp_vacant":
+		return "Vacant";
+	case "mp_vlobby_room":
+		return "Lobby Map";
+	case "mp_broadcast":
+		return "Broadcast";
+	case "mp_carentan":
+		return "Chinatown";
+	case "mp_countdown":
+		return "Countdown";
+	case "mp_bloc":
+		return "Bloc";
+	case "mp_creek":
+		return "Creek";
+	case "mp_killhouse":
+		return "Killhouse";
+	case "mp_pipeline":
+		return "Pipeline";
+	case "mp_strike":
+		return "Strike";
+	case "mp_showdown":
+		return "Showdown";
+	case "mp_cargoship":
+		return "Wet Work";
+	case "mp_crash_snow":
+		return "Winter Crash";
+	case "mp_farm_spring":
+		return "Day Break";
+	case "mp_bog_summer":
+		return "Beach Bog";
+	// H2M
+	case "airport":
+		return "Airport";
+	case "cliffhanger":
+		return "Blizzard";
+	case "contingency":
+		return "Contingency";
+	case "dcburning":
+		return "DC Burning";
+	case "boneyard":
+		return "Dumpsite";
+	case "gulag":
+		return "Gulag";
+	case "oilrig":
+		return "Oilrig";
+	case "estate":
+		return "Safehouse";
+	case "dc_whitehouse":
+		return "Whiskey Hotel";
+	case "mp_afghan":
+		return "Afghan";
+	case "mp_derail":
+		return "Derail";
+	case "mp_estate":
+		return "Estate";
+	case "mp_favela":
+		return "Favela";
+	case "mp_highrise":
+		return "Highrise";
+	case "mp_invasion":
+		return "Invasion";
+	case "mp_checkpoint":
+		return "Karachi";
+	case "mp_quarry":
+		return "Quarry";
+	case "mp_rust":
+		return "Rust";
+	case "mp_boneyard":
+		return "Scrapyard";
+	case "mp_nightshift":
+		return "Skidrow";
+	case "mp_subbase":
+		return "Sub Base";
+	case "mp_terminal":
+		return "Terminal";
+	case "mp_underpass":
+		return "Underpass";
+	case "mp_brecourt":
+		return "Wasteland";
+	case "mp_complex":
+		return "Bailout";
+	case "mp_compact":
+		return "Salvage";
+	case "mp_storm":
+		return "Storm";
+	case "mp_abandon":
+		return "Carnival";
+	case "mp_fuel2":
+		return "Fuel";
+	case "mp_trailerpark":
+		return "Trailer Park";
+	default:
+		return mapid;
+	}
 }
+
 /**
  * Returns the loadscreen name for a given map ID.
  * @param {string} mapid - The map ID.
@@ -824,7 +906,7 @@ mapidToLoadscreen(mapid)
 	mapid = tolower(mapid);
 	return "loadscreen_" + mapid;
 
- 	/*	
+	/*
 		If there are maps that have unconventional file names, use an if case and change the return value to the appropriate one.
 
 		if (mapid == "mp_convoy") return "loadscreen_mp_convoy";
@@ -852,7 +934,7 @@ mapidToLoadscreen(mapid)
 		if (mapid == "mp_farm_spring") return "loadscreen_mp_farm_spring";
 		if (mapid == "mp_bog_summer") return "loadscreen_mp_bog_summer";
 	*/
-    return mapid;
+	return mapid;
 }
 /**
  * Sets the value of a dvar if it is not already initialized.
@@ -880,7 +962,7 @@ IsInizialized(dvar)
 
 /**
  * Converts a game type abbreviation to its corresponding display name.
- * 
+ *
  * @param {string} gametype - The game type abbreviation.
  * @returns {string} - The display name of the game type.
  */
@@ -888,41 +970,41 @@ gametypeToDisplayName(gametype)
 {
 	switch (tolower(gametype))
 	{
-		case "dm":
-			return "Free for all";
-		case "war":
-			return "Team Deathmatch";
-		case "sd":
-			return "Search & Destroy";
-		case "conf":
-			return "Kill Confirmed";
-		case "ctf":
-			return "Capture the Flag";
-		case "dom":
-			return "Domination";
-		case "dem":
-			return "Demolition";
-		case "gun":
-			return "Gun Game";
-		case "hq":
-			return "Headquaters";
-		case "koth":
-			return "Hardpoint";
-		case "oic":
-			return "One in the chamber";
-		case "oneflag":
-			return "One-Flag CTF";
-		case "sas":
-			return "Sticks & Stones";
-		case "shrp":
-			return "Sharpshooter";
+	case "dm":
+		return "Free for all";
+	case "war":
+		return "Team Deathmatch";
+	case "sd":
+		return "Search & Destroy";
+	case "conf":
+		return "Kill Confirmed";
+	case "ctf":
+		return "Capture the Flag";
+	case "dom":
+		return "Domination";
+	case "dem":
+		return "Demolition";
+	case "gun":
+		return "Gun Game";
+	case "hq":
+		return "Headquaters";
+	case "koth":
+		return "Hardpoint";
+	case "oic":
+		return "One in the chamber";
+	case "oneflag":
+		return "One-Flag CTF";
+	case "sas":
+		return "Sticks & Stones";
+	case "shrp":
+		return "Sharpshooter";
 	}
 	return "invalid";
 }
 
 /**
  * Checks if a player is a bot.
- * 
+ *
  * @param entity The player entity to check.
  * @returns True if the player is a bot, false otherwise.
  */
@@ -944,7 +1026,7 @@ is_bot(entity)
 
 /**
  * Validates a color value.
- * 
+ *
  * @param value - The color value to validate.
  * @returns True if the value is a valid color (0-7), false otherwise.
  */
@@ -955,7 +1037,7 @@ ValidateColor(value)
 
 /**
  * GetColor function returns the RGB values of a given color name.
- * 
+ *
  * @param {string} color - The name of the color.
  * @returns {array} - An array containing the RGB values of the color.
  */
@@ -963,49 +1045,49 @@ GetColor(color)
 {
 	switch (tolower(color))
 	{
-		case "red":
-			return (0.960, 0.180, 0.180);
+	case "red":
+		return (0.960, 0.180, 0.180);
 
-		case "black":
-			return (0, 0, 0);
+	case "black":
+		return (0, 0, 0);
 
-		case "grey":
-			return (0.035, 0.059, 0.063);
+	case "grey":
+		return (0.035, 0.059, 0.063);
 
-		case "purple":
-			return (1, 0.282, 1);
+	case "purple":
+		return (1, 0.282, 1);
 
-		case "pink":
-			return (1, 0.623, 0.811);
+	case "pink":
+		return (1, 0.623, 0.811);
 
-		case "green":
-			return (0, 0.69, 0.15);
+	case "green":
+		return (0, 0.69, 0.15);
 
-		case "blue":
-			return (0, 0, 1);
+	case "blue":
+		return (0, 0, 1);
 
-		case "lightblue":
-		case "light blue":
-			return (0.152, 0329, 0.929);
+	case "lightblue":
+	case "light blue":
+		return (0.152, 0329, 0.929);
 
-		case "lightgreen":
-		case "light green":
-			return (0.09, 1, 0.09);
+	case "lightgreen":
+	case "light green":
+		return (0.09, 1, 0.09);
 
-		case "orange":
-			return (1, 0662, 0.035);
+	case "orange":
+		return (1, 0662, 0.035);
 
-		case "yellow":
-			return (0.968, 0.992, 0.043);
+	case "yellow":
+		return (0.968, 0.992, 0.043);
 
-		case "brown":
-			return (0.501, 0.250, 0);
+	case "brown":
+		return (0.501, 0.250, 0);
 
-		case "cyan":
-			return (0, 1, 1);
+	case "cyan":
+		return (0, 1, 1);
 
-		case "white":
-			return (1, 1, 1);
+	case "white":
+		return (1, 1, 1);
 	}
 }
 
