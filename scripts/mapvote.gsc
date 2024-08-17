@@ -334,7 +334,6 @@ ArrayRemoveElement(array, todelete)
 		}
 		else
 		{
-			printf(element);
 			newarray[newarray.size] = element;
 		}
 	}
@@ -358,7 +357,6 @@ MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from t
 		logPrint("map;" + map + ";index;" + index + "\n");
 		if (GetDvarInt("mv_maps_norepeat"))
 		{
-			printf("mv_maps");
 			mapsIDsList = ArrayRemoveElement(mapsIDsList, map);
 		}
 		// arrayremovevalue(mapsIDsList , map);
@@ -384,7 +382,6 @@ MapvoteChooseRandomGametypesSelection(gametypesIDsList, times) // Select random 
 		gametypeschoosed[i] = gametype;
 		if (GetDvarInt("mv_gametypes_norepeat"))
 		{
-			printf("mv_gametypes");
 			gametypesIDsList = ArrayRemoveElement(gametypesIDsList, gametype);
 		}
 		// arrayremovevalue(mapsIDsList , map);
