@@ -49,17 +49,17 @@ init()
 		level.mapvotedata["firstmap"].mapname = mapToDisplayName(mapschoosed[0]);
 		level.mapvotedata["firstmap"].mapid = mapschoosed[0];
 		level.mapvotedata["firstmap"].gametype = gametypes[0];
-		level.mapvotedata["firstmap"].gametypename = gametypeToName(strTok(level.mapvotedata["firstmap"].gametype, ";")[0]);
+		level.mapvotedata["firstmap"].gametypename = gametypeToDisplayName(strTok(level.mapvotedata["firstmap"].gametype, ";")[0]);
 		// level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[0]);
 		level.mapvotedata["secondmap"].mapname = mapToDisplayName(mapschoosed[1]);
 		level.mapvotedata["secondmap"].mapid = mapschoosed[1];
 		level.mapvotedata["secondmap"].gametype = gametypes[1];
-		level.mapvotedata["secondmap"].gametypename = gametypeToName(strTok(level.mapvotedata["secondmap"].gametype, ";")[0]);
+		level.mapvotedata["secondmap"].gametypename = gametypeToDisplayName(strTok(level.mapvotedata["secondmap"].gametype, ";")[0]);
 		// level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[1]);
 		level.mapvotedata["thirdmap"].mapname = mapToDisplayName(mapschoosed[2]);
 		level.mapvotedata["thirdmap"].mapid = mapschoosed[2];
 		level.mapvotedata["thirdmap"].gametype = gametypes[2];
-		level.mapvotedata["thirdmap"].gametypename = gametypeToName(strTok(level.mapvotedata["thirdmap"].gametype, ";")[0]);
+		level.mapvotedata["thirdmap"].gametypename = gametypeToDisplayName(strTok(level.mapvotedata["thirdmap"].gametype, ";")[0]);
 		// level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[2]);
 
 		// preCacheShader(level.mapvotedata["firstmap"].loadscreen);
