@@ -17,7 +17,7 @@
 	- Implemented mv_randomoption dvar that will not display which map and which gametype the last option will be (Random)
 	- Implemented mv_minplayerstovote dvar to set the minimum number of players required to start the mapvote
 	- Implemented mv_gametypes_norepeat that will enable or disable gametypes duplicate
-    - Implemented mv_maps_norepeat that will enable or disable maps duplicate
+	- Implemented mv_maps_norepeat that will enable or disable maps duplicate
 */
 
 init()
@@ -289,11 +289,7 @@ MapvoteConfig()
 	setDvarIfNotInizialized("mv_minplayerstovote", 1);
 	setDvarIfNotInizialized("mv_maps_norepeat", 0);
 	setDvarIfNotInizialized("mv_gametypes_norepeat", 0);
-	/*
-		TODO: 
-		TODO: setDvarIfNotInizialized("mv_randomoption", 1);
-		
-	*/
+	setDvarIfNotInizialized("mv_randomoption", 1);
 }
 
 /**
