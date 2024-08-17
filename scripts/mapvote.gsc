@@ -35,7 +35,7 @@ init()
 		level.mapvote_started = 1;
 
 		gametypesIDsList = strTok(getDvar("mv_gametypes"), " ");
-		gametypes = MapvoteChooseRandomGametypesSelection(mapsIDsList, times);
+		gametypes = MapvoteChooseRandomGametypesSelection(mapsIDsList, 3);
 
 		mapsIDsList = [];
 		mapsIDsList = strTok(getDvar("mv_maps"), " ");
