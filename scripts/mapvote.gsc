@@ -276,7 +276,7 @@ MapvoteConfig()
 		return;						  // End if the mapvote its not enable
 
 	level.mapvotedata = [];
-	SetDvarIfNotInizialized("mv_enable", 20);
+	SetDvarIfNotInizialized("mv_time", 20);
 	level.mapvotedata["time"] = getDvarInt("mv_time");
 
 	SetDvarIfNotInizialized("mv_maps", "mp_convoy mp_backlot mp_bog mp_crash mp_crossfire mp_citystreets mp_farm mp_overgrown mp_shipment mp_vacant mp_broadcast mp_carentan mp_countdown mp_bloc mp_creek mp_killhouse mp_pipeline mp_strike mp_showdown mp_cargoship mp_crash_snow mp_farm_spring mp_bog_summer");
