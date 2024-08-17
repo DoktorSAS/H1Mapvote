@@ -994,7 +994,7 @@ gametypeToDisplayName(gametype)
 	case "gun":
 		return "Gun Game";
 	case "koth":
-		return "Headquaters";
+		return "Headquarters";
 	case "hp":
 		return "Hardpoint";
 	case "oic":
