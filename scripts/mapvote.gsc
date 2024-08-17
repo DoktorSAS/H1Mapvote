@@ -12,6 +12,9 @@
 	1.0.0:
 	- 3 maps support
 	- Credits, sentence and social on bottom left
+
+	1.0.0:
+	- 
 */
 
 init()
@@ -22,7 +25,7 @@ init()
 	preCacheShader("line_vertical");
 
 	level thread onPlayerConnected();
-	level thread MapvoteConfig();
+	MapvoteConfig();
 
 	if (!isDefined(level.mapvote_started))
 	{
@@ -51,10 +54,11 @@ init()
 		//preCacheShader(level.mapvotedata["secondmap"].loadscreen);
 		//preCacheShader(level.mapvotedata["thirdmap"].loadscreen);
 
-		gametypes = strTok(getDvar("mv_gametypes"), " ");
-		g1 = gametypes[randomIntRange(0, gametypes.size)];
-		g2 = gametypes[randomIntRange(0, gametypes.size)];
-		g3 = gametypes[randomIntRange(0, gametypes.size)];
+		gametypesIDsList = strTok(getDvar("mv_gametypes"), " ");
+		gametypes = MapvoteChooseRandomGametypesSelection(mapsIDsList, times);
+		g1 = gametypes[0];
+		g2 = gametypes[1];
+		g3 = gametypes[2];
 
 		level.mapvotedata["firstmap"].gametype = g1;
 		level.mapvotedata["secondmap"].gametype = g2;
@@ -250,17 +254,22 @@ MapvoteConfig()
 	
 	SetDvarIfNotInizialized("mv_maps", "mp_convoy mp_backlot mp_bog mp_crash mp_crossfire mp_citystreets mp_farm mp_overgrown mp_shipment mp_vacant mp_broadcast mp_carentan mp_countdown mp_bloc mp_creek mp_killhouse mp_pipeline mp_strike mp_showdown mp_cargoship mp_crash_snow mp_farm_spring mp_bog_summer");
 	SetDvarIfNotInizialized("mv_credits", 1);
-	SetDvarIfNotInizialized("mv_socialsmv_socials", 1);
 	SetDvarIfNotInizialized("mv_socialname", "Website");
 	SetDvarIfNotInizialized("mv_sociallink", "^3h1.gg^7");
 	SetDvarIfNotInizialized("mv_sentence", "Thanks for Playing by @DoktorSAS");
 	SetDvarIfNotInizialized("mv_votecolor", "5");
-	SetDvarIfNotInizialized("mv_blur", "3");
 	SetDvarIfNotInizialized("mv_scrollcolor", "cyan");
 	SetDvarIfNotInizialized("mv_selectcolor", "lightgreen");
+	SetDvarIfNotInizialized("mv_blur", "3");
 	SetDvarIfNotInizialized("mv_backgroundcolor", "grey");
 	SetDvarIfNotInizialized("mv_gametypes", "dm;dm.cfg war;war.cfg sd;sd.cfg");
 	setDvarIfNotInizialized("mv_allowchangevote", 1);
+	/*
+		TODO: setDvarIfNotInizialized("mv_minplayerstovote", 1);
+		TODO: setDvarIfNotInizialized("mv_randomoption", 1);
+		TODO: setDvarIfNotInizialized("mv_maps_norepeat", 0);
+		TODO: setDvarIfNotInizialized("mv_gametypes_norepeat", 0);
+	*/
 }
 
 /**
@@ -288,32 +297,83 @@ ExecuteMapvote()
 }
 
 /**
- * Selects random maps from the given list.
- * 
- * @param mapsIDsList - The array of map IDs to choose from.
- * @returns An array of randomly selected map IDs.
+ * Removes a specified element from an array and returns a new array without the element.
+ *
+ * @param array The array from which to remove the element.
+ * @param todelete The element to be removed from the array.
+ * @return The new array without the specified element.
  */
-MapvoteChooseRandomMapsSelection(mapsIDsList)
-{
-	mapschoosed = [];
-	for (i = 0; i < 3; i++)
-	{
-		index = randomIntRange(0, mapsIDsList.size);
-		map = mapsIDsList[index];
-		//mapsIDsList = ArrayRemoveByIndex(mapsIDsList, index);
-
-		size = mapsIDsList.size;
-		for (j = index; j < mapsIDsList.size-1; j++)
-		{
-			mapsIDsList[j] = mapsIDsList[j+1];
-		}
-		mapsIDsList[size] = undefined;
-
-		mapschoosed[i] = map;
-	}
-
-	return mapschoosed;
-}
+ ArrayRemoveElement(array, todelete)
+ {
+	 newarray = [];
+	 once = 0;
+	 for (i = 0; i < array.size; i++)
+	 {
+		 element = array[i];
+		 if (element == todelete && !once)
+		 {
+			 once = 1;
+		 }
+		 else
+		 {
+			 printf(element);
+			 newarray[newarray.size] = element;
+		 }
+	 }
+	 return newarray;
+ }
+/**
+ * Selects random maps from the given list.
+ *
+ * @param mapsIDsList - The list of map IDs to choose from.
+ * @param times - The number of maps to select.
+ * @return An array containing the randomly selected maps.
+ */
+ MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from the list
+ {
+	 mapschoosed = [];
+	 for (i = 0; i < times; i++)
+	 {
+		 index = randomIntRange(0, mapsIDsList.size);
+		 map = mapsIDsList[index];
+		 mapschoosed[i] = map;
+		 logPrint("map;" + map + ";index;" + index + "\n");
+		 if (GetDvarInt("mv_maps_norepeat"))
+		 {
+			 printf("mv_maps");
+			 mapsIDsList = ArrayRemoveElement(mapsIDsList, map);
+		 }
+		 // arrayremovevalue(mapsIDsList , map);
+	 }
+ 
+	 return mapschoosed;
+ }
+ 
+ /**
+  * Selects random gametypes from the given list.
+  *
+  * @param gametypesIDsList - The list of gametypes IDs to choose from.
+  * @param times - The number of maps to select.
+  * @return An array containing the randomly selected maps.
+  */
+ MapvoteChooseRandomGametypesSelection(gametypesIDsList, times) // Select random map from the list
+ {
+	 gametypeschoosed = [];
+	 for (i = 0; i < times; i++)
+	 {
+		 index = randomIntRange(0, gametypesIDsList.size);
+		 gametype = gametypesIDsList[index];
+		 gametypeschoosed[i] = gametype;
+		 if (GetDvarInt("mv_gametypes_norepeat"))
+		 {
+			 printf("mv_gametypes");
+			 gametypesIDsList = ArrayRemoveElement(gametypesIDsList, gametype);
+		 }
+		 // arrayremovevalue(mapsIDsList , map);
+	 }
+ 
+	 return gametypeschoosed;
+ }
 
 /**
  * Displays the map voting UI for players.
@@ -570,7 +630,7 @@ MapvoteSetRotation(mapid, gametype)
 		if (array.size > 1)
 		{
 			setdvar("g_gametype", array[0]);
-			str = "gametype " + array[0] + "; map " + mapid;
+			str = "gametype " + array[0] + " map " + mapid;
 			// Debug print
 			logPrint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
 		}
@@ -581,9 +641,6 @@ MapvoteSetRotation(mapid, gametype)
 			logPrint("mapvote//gametype//" + gametype + "//executing//" + str + "\n");
 		}
 	}
-
-
-
 	// Set the Dvars for map rotation
 	
 	setdvar("sv_currentmaprotation", str);
