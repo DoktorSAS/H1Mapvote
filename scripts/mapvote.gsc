@@ -5,9 +5,9 @@
 #include maps\mp\gametypes\_gamelogic;
 
 /*
-	Plutonium H1 Mapvote
+	Plutonium H1 & H2 Mapvote
 	Developed by DoktorSAS
-	Version: v1.0.0
+	Version: v1.1.0
 
 	1.0.0:
 	- 3 maps support
@@ -993,9 +993,9 @@ gametypeToDisplayName(gametype)
 		return "Demolition";
 	case "gun":
 		return "Gun Game";
-	case "hq":
-		return "Headquaters";
 	case "koth":
+		return "Headquaters";
+	case "hp":
 		return "Hardpoint";
 	case "oic":
 		return "One in the chamber";
