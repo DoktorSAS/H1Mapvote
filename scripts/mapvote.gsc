@@ -29,8 +29,9 @@ init()
 
 	level thread onPlayerConnected();
 	MapvoteConfig();
+	waittillframeend;
 
-	if (!isDefined(level.mapvote_started))
+	if (!isDefined(level.mapvote_started) || level.mapvote_started == undefined || level.mapvote_started == 0)
 	{
 		level.mapvote_started = 1;
 
@@ -40,7 +41,7 @@ init()
 		mapsIDsList = [];
 		mapsIDsList = strTok(getDvar("mv_maps"), " ");
 		mapschoosed = [];
-		mapschoosed = MapvoteChooseRandomMapsSelection(mapsIDsList);
+		mapschoosed = MapvoteChooseRandomMapsSelection(mapsIDsList, 3);
 
 		level.mapvotedata["firstmap"] = spawnStruct();
 		level.mapvotedata["secondmap"] = spawnStruct();
@@ -88,7 +89,7 @@ init()
 
 main()
 {
-	replacefunc(maps\mp\gametypes\_gamelogic::waittillfinalkillcamdone, ::waittillfinalkillcamdone);
+	//replacefunc(maps\mp\gametypes\_gamelogic::waittillfinalkillcamdone, ::waittillfinalkillcamdone);
 	if (getDvar("g_gametype") == "sd" || getDvar("g_gametype") == "sr")
 	{
 		replacefunc(maps\mp\gametypes\_damage::erasefinalkillcam, ::erasefinalkillcam);
@@ -176,9 +177,13 @@ erasefinalkillcam()
 	level.finalkillcam_type["none"] = undefined;
 	level.finalkillcam_usestarttime["none"] = undefined;
 	level.finalkillcam_winner = undefined;
+	//if (waslastround())
+	//{
+	//	[[level.CallMapvote]] ();
+	//}
 	if (waslastround())
 	{
-		[[level.CallMapvote]] ();
+		ExecuteMapvote();
 	}
 }
 
@@ -188,9 +193,14 @@ waittillfinalkillcamdone()
 		return 0;
 
 	level waittill("final_killcam_done");
+	//if (waslastround())
+	//{
+	//	[[level.CallMapvote]] ();
+	//}
+
 	if (waslastround())
 	{
-		[[level.CallMapvote]] ();
+		ExecuteMapvote();
 	}
 
 	return 1;
@@ -266,7 +276,7 @@ MapvoteConfig()
 		return;						  // End if the mapvote its not enable
 
 	level.mapvotedata = [];
-	SetDvarIfNotInizialized("mv_time", 20);
+	SetDvarIfNotInizialized("mv_enable", 20);
 	level.mapvotedata["time"] = getDvarInt("mv_time");
 
 	SetDvarIfNotInizialized("mv_maps", "mp_convoy mp_backlot mp_bog mp_crash mp_crossfire mp_citystreets mp_farm mp_overgrown mp_shipment mp_vacant mp_broadcast mp_carentan mp_countdown mp_bloc mp_creek mp_killhouse mp_pipeline mp_strike mp_showdown mp_cargoship mp_crash_snow mp_farm_spring mp_bog_summer");
@@ -354,7 +364,7 @@ MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from t
 		index = randomIntRange(0, mapsIDsList.size);
 		map = mapsIDsList[index];
 		mapschoosed[i] = map;
-		logPrint("map;" + map + ";index;" + index + "\n");
+		print("map;" + map + ";index;" + index + "\n");
 		if (GetDvarInt("mv_maps_norepeat"))
 		{
 			mapsIDsList = ArrayRemoveElement(mapsIDsList, map);
@@ -647,13 +657,13 @@ MapvoteSetRotation(mapid, gametype)
 			setdvar("g_gametype", array[0]);
 			str = "gametype " + array[0] + " map " + mapid;
 			// Debug print
-			logPrint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
+			print("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
 		}
 		else
 		{
 			setdvar("g_gametype", gametype);
 			// Debug print
-			logPrint("mapvote//gametype//" + gametype + "//executing//" + str + "\n");
+			print("mapvote//gametype//" + gametype + "//executing//" + str + "\n");
 		}
 	}
 	// Set the Dvars for map rotation
@@ -664,6 +674,7 @@ MapvoteSetRotation(mapid, gametype)
 
 	// Notify that the map rotation has been set
 	level notify("mv_ended");
+	level.mapvote_started = 0; // Required since memory its not cleared at the end of the game
 }
 
 /**
