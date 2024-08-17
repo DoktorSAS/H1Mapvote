@@ -31,7 +31,7 @@ init()
 	MapvoteConfig();
 	waittillframeend;
 
-	if (!isDefined(level.mapvote_started) || level.mapvote_started == undefined || level.mapvote_started == 0)
+	if (!isDefined(level.mapvote_started))
 	{
 		level.mapvote_started = 1;
 
@@ -82,14 +82,14 @@ init()
 				level.mapvotedata["thirdmap"].loadscreen = "gradient";
 			}
 		}
-	}
 
-	level.CallMapvote = ::CallMapvote;
+		level.CallMapvote = ::CallMapvote;
+	}
 }
 
 main()
 {
-	//replacefunc(maps\mp\gametypes\_gamelogic::waittillfinalkillcamdone, ::waittillfinalkillcamdone);
+	replacefunc(maps\mp\gametypes\_gamelogic::waittillfinalkillcamdone, ::waittillfinalkillcamdone);
 	if (getDvar("g_gametype") == "sd" || getDvar("g_gametype") == "sr")
 	{
 		replacefunc(maps\mp\gametypes\_damage::erasefinalkillcam, ::erasefinalkillcam);
@@ -364,7 +364,7 @@ MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from t
 		index = randomIntRange(0, mapsIDsList.size);
 		map = mapsIDsList[index];
 		mapschoosed[i] = map;
-		print("map;" + map + ";index;" + index + "\n");
+		logprint("map;" + map + ";index;" + index + "\n");
 		if (GetDvarInt("mv_maps_norepeat"))
 		{
 			mapsIDsList = ArrayRemoveElement(mapsIDsList, map);
@@ -656,14 +656,14 @@ MapvoteSetRotation(mapid, gametype)
 		{
 			setdvar("g_gametype", array[0]);
 			str = "gametype " + array[0] + " map " + mapid;
-			// Debug print
-			print("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
+			// Debug logprint
+			logprint("mapvote//gametype//" + array[0] + "//executing//" + str + "\n");
 		}
 		else
 		{
 			setdvar("g_gametype", gametype);
-			// Debug print
-			print("mapvote//gametype//" + gametype + "//executing//" + str + "\n");
+			// Debug logprint
+			logprint("mapvote//gametype//" + gametype + "//executing//" + str + "\n");
 		}
 	}
 	// Set the Dvars for map rotation
@@ -674,7 +674,6 @@ MapvoteSetRotation(mapid, gametype)
 
 	// Notify that the map rotation has been set
 	level notify("mv_ended");
-	level.mapvote_started = 0; // Required since memory its not cleared at the end of the game
 }
 
 /**
