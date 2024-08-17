@@ -13,8 +13,11 @@
 	- 3 maps support
 	- Credits, sentence and social on bottom left
 
-	1.0.0:
-	- 
+	1.1.0:
+	- Implemented mv_randomoption dvar that will not display which map and which gametype the last option will be (Random)
+	- Implemented mv_minplayerstovote dvar to set the minimum number of players required to start the mapvote
+	- Implemented mv_gametypes_norepeat that will enable or disable gametypes duplicate
+    - Implemented mv_maps_norepeat that will enable or disable maps duplicate
 */
 
 init()
@@ -42,12 +45,15 @@ init()
 
 		level.mapvotedata["firstmap"].mapname = mapToDisplayName(mapschoosed[0]);
 		level.mapvotedata["firstmap"].mapid = mapschoosed[0];
+		level.mapvotedata["firstmap"].gametypename = gametypeToName(strTok(level.mapvotedata["firstmap"].gametype, ";")[0]);
 		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[0]);
 		level.mapvotedata["secondmap"].mapname = mapToDisplayName(mapschoosed[1]);
 		level.mapvotedata["secondmap"].mapid = mapschoosed[1];
+		level.mapvotedata["secondmap"].gametypename = gametypeToName(strTok(level.mapvotedata["secondmap"].gametype, ";")[0]);
 		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[1]);
 		level.mapvotedata["thirdmap"].mapname = mapToDisplayName(mapschoosed[2]);
 		level.mapvotedata["thirdmap"].mapid = mapschoosed[2];
+		level.mapvotedata["thirdmap"].gametypename = gametypeToName(strTok(level.mapvotedata["thirdmap"].gametype, ";")[0]);
 		//level.mapvotedata["thirdmap"].loadscreen = mapidToLoadscreen(mapschoosed[2]);
 
 		//preCacheShader(level.mapvotedata["firstmap"].loadscreen);
@@ -63,6 +69,22 @@ init()
 		level.mapvotedata["firstmap"].gametype = g1;
 		level.mapvotedata["secondmap"].gametype = g2;
 		level.mapvotedata["thirdmap"].gametype = g3;
+
+		if (GetDvarInt("mv_randomoption") == 1)
+		{
+			if (GetDvarInt("mv_extramaps") == 1)
+			{
+				level.mapvotedata["sixthmap"].mapname = "Random";
+				level.mapvotedata["sixthmap"].gametypename = "Random";
+				level.mapvotedata["sixthmap"].loadscreen = "gradient";
+			}
+			else
+			{
+				level.mapvotedata["thirdmap"].mapname = "Random";
+				level.mapvotedata["thirdmap"].gametypename = "Random";
+				level.mapvotedata["thirdmap"].loadscreen = "gradient";
+			}
+		}
 	}
 
 	level.CallMapvote = ::CallMapvote;
@@ -264,11 +286,13 @@ MapvoteConfig()
 	SetDvarIfNotInizialized("mv_backgroundcolor", "grey");
 	SetDvarIfNotInizialized("mv_gametypes", "dm;dm.cfg war;war.cfg sd;sd.cfg");
 	setDvarIfNotInizialized("mv_allowchangevote", 1);
+	setDvarIfNotInizialized("mv_minplayerstovote", 1);
+	setDvarIfNotInizialized("mv_maps_norepeat", 0);
+	setDvarIfNotInizialized("mv_gametypes_norepeat", 0);
 	/*
-		TODO: setDvarIfNotInizialized("mv_minplayerstovote", 1);
+		TODO: 
 		TODO: setDvarIfNotInizialized("mv_randomoption", 1);
-		TODO: setDvarIfNotInizialized("mv_maps_norepeat", 0);
-		TODO: setDvarIfNotInizialized("mv_gametypes_norepeat", 0);
+		
 	*/
 }
 
@@ -284,16 +308,19 @@ ExecuteMapvote()
 	if (getDvarInt("mv_enable") != 1) // Check if mapvote is enable
 		return;						  // End if the mapvote its not enable
 
-	foreach (player in level.players)
+	if (_countPlayers() >= getDvarInt("mv_minplayerstovote"))
 	{
-		if (!is_bot(player))
-			player thread MapvotePlayerUI();
-	}
-	
-	waittillframeend;
+		foreach (player in level.players)
+		{
+			if (!is_bot(player))
+				player thread MapvotePlayerUI();
+		}
+		
+		waittillframeend;
 
-	level thread MapvoteServerUI();
-	MapvoteHandler();
+		level thread MapvoteServerUI();
+		MapvoteHandler();
+	}
 }
 
 /**
@@ -669,9 +696,9 @@ MapvoteServerUI()
 
 	mv_votecolor = getDvar("mv_votecolor");
 
-	textline1 = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + gametypeToDisplayName(strTok(level.mapvotedata["secondmap"].gametype, ";")[0]), "objective", 1.1, "center", "center", -220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
-	textline2 = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + gametypeToDisplayName(strTok(level.mapvotedata["secondmap"].gametype, ";")[0]), "objective", 1.1, "center", "center", 0, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
-	textline3 = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + gametypeToDisplayName(strTok(level.mapvotedata["thirdmap"].gametype, ";")[0]), "objective", 1.1, "center", "center", 220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+	textline1 = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "center", "center", -220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+	textline2 = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "center", "center", 0, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+	textline3 = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + level.mapvotedata["thirdmap"].gametypename, "objective", 1.1, "center", "center", 220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
 
 	textlinebackground1 = level CreateRectangle("center", "center", -220, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
 	textlinebackground2 = level CreateRectangle("center", "center", 0, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
@@ -720,6 +747,20 @@ MapvoteServerUI()
 }
 
 // Utils
+
+_countPlayers()
+{
+	count = 0;
+	foreach (player in level.players)
+	{
+		if (!is_bot(player))
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
 /**
  * Removes an element from an array by its index.
  * 
