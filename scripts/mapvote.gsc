@@ -190,18 +190,25 @@ erasefinalkillcam()
 waittillfinalkillcamdone()
 {
 	if (!isdefined(level.finalkillcam_winner))
+	{
+		if (waslastround())
+		{
+			ExecuteMapvote();
+		}
 		return 0;
+	}
+		
 
 	level waittill("final_killcam_done");
 	//if (waslastround())
 	//{
 	//	[[level.CallMapvote]] ();
 	//}
-
 	if (waslastround())
 	{
 		ExecuteMapvote();
 	}
+	
 
 	return 1;
 }
