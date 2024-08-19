@@ -980,6 +980,8 @@ mapToDisplayName(mapid)
 		return "Day Break";
 	case "mp_bog_summer":
 		return "Beach Bog";
+	case "mp_rundown":
+		return "Rundown";
 	// H2M
 	case "airport":
 		return "Airport";
