@@ -22,7 +22,6 @@
 	1.1.1:
 	- Implemented mv_extended dvar that will allow to choose in between 6 maps
 	- Solved issue https://github.com/DoktorSAS/H1Mapvote/issues/6
-	
 */
 
 init()
@@ -39,18 +38,25 @@ init()
 	if (!isDefined(level.mapvote_started))
 	{
 		level.mapvote_started = 1;
-
+		times = 3;
+		if(GetDvarInt("mv_extended") == 1)
+		{
+			times = 6;
+		}
 		gametypesIDsList = strTok(getDvar("mv_gametypes"), " ");
-		gametypes = MapvoteChooseRandomGametypesSelection(gametypesIDsList, 3);
+		gametypes = MapvoteChooseRandomGametypesSelection(gametypesIDsList, times);
 
 		mapsIDsList = [];
 		mapsIDsList = strTok(getDvar("mv_maps"), " ");
 		mapschoosed = [];
-		mapschoosed = MapvoteChooseRandomMapsSelection(mapsIDsList, 3);
+		mapschoosed = MapvoteChooseRandomMapsSelection(mapsIDsList, times);
 
 		level.mapvotedata["firstmap"] = spawnStruct();
 		level.mapvotedata["secondmap"] = spawnStruct();
 		level.mapvotedata["thirdmap"] = spawnStruct();
+		level.mapvotedata["fourthmap"] = spawnStruct();
+		level.mapvotedata["fifthmap"] = spawnStruct();
+		level.mapvotedata["sixthmap"] = spawnStruct();
 
 		level.mapvotedata["firstmap"].mapname = mapToDisplayName(mapschoosed[0]);
 		level.mapvotedata["firstmap"].mapid = mapschoosed[0];
@@ -72,9 +78,28 @@ init()
 		// preCacheShader(level.mapvotedata["secondmap"].loadscreen);
 		// preCacheShader(level.mapvotedata["thirdmap"].loadscreen);
 
+		if(GetDvarInt("mv_extended"))
+		{
+			level.mapvotedata["fourthmap"].mapname = mapToDisplayName(mapschoosed[3]);
+			level.mapvotedata["fourthmap"].mapid = mapschoosed[3];
+			level.mapvotedata["fourthmap"].gametype = gametypes[3];
+			level.mapvotedata["fourthmap"].gametypename = gametypeToDisplayName(strTok(level.mapvotedata["fourthmap"].gametype, ";")[3]);
+			// level.mapvotedata["fourthmap"].loadscreen = mapidToLoadscreen(mapschoosed[3]);
+			level.mapvotedata["fifthmap"].mapname = mapToDisplayName(mapschoosed[4]);
+			level.mapvotedata["fifthmap"].mapid = mapschoosed[4];
+			level.mapvotedata["fifthmap"].gametype = gametypes[4];
+			level.mapvotedata["fifthmap"].gametypename = gametypeToDisplayName(strTok(level.mapvotedata["fifthmap"].gametype, ";")[4]);
+			// level.mapvotedata["fifthmap"].loadscreen = mapidToLoadscreen(mapschoosed[1]);
+			level.mapvotedata["sixthmap"].mapname = mapToDisplayName(mapschoosed[5]);
+			level.mapvotedata["sixthmap"].mapid = mapschoosed[5];
+			level.mapvotedata["sixthmap"].gametype = gametypes[5];
+			level.mapvotedata["sixthmap"].gametypename = gametypeToDisplayName(strTok(level.mapvotedata["sixthmap"].gametype, ";")[5]);
+			// level.mapvotedata["sixthmap"].loadscreen = mapidToLoadscreen(mapschoosed[5]);
+		}
+
 		if (GetDvarInt("mv_randomoption") == 1)
 		{
-			if (GetDvarInt("mv_extramaps") == 1)
+			if (GetDvarInt("mv_extended") == 1)
 			{
 				level.mapvotedata["sixthmap"].mapname = "Random";
 				level.mapvotedata["sixthmap"].gametypename = "Random";
@@ -301,7 +326,7 @@ MapvoteConfig()
 	SetDvarIfNotInizialized("mv_selectcolor", "lightgreen");
 	SetDvarIfNotInizialized("mv_blur", "3");
 	SetDvarIfNotInizialized("mv_backgroundcolor", "grey");
-	SetDvarIfNotInizialized("mv_gametypes", "dm;dm.cfg war;war.cfg sd;sd.cfg");
+	SetDvarIfNotInizialized("mv_gametypes", "dm;dm.cfg war;war.cfg sd;sd.cfg dm;dm.cfg war;war.cfg sd;sd.cfg");
 	setDvarIfNotInizialized("mv_allowchangevote", 1);
 	setDvarIfNotInizialized("mv_minplayerstovote", 1);
 	setDvarIfNotInizialized("mv_maps_norepeat", 0);
@@ -647,9 +672,9 @@ MapvoteHandler()
 		votes[0] = level CreateVoteDisplayObject(70, -120, level.mapvotedata["firstmap"]);
 		votes[1] = level CreateVoteDisplayObject(70, -120 + 40, level.mapvotedata["secondmap"]);
 		votes[2] = level CreateVoteDisplayObject(70, -120 + 80, level.mapvotedata["thirdmap"]);
-		votes[3] = level CreateVoteDisplayObject(70, -120 + 120, level.mapvotedata["firstmap"]);
-		votes[4] = level CreateVoteDisplayObject(70, -120 + 160, level.mapvotedata["secondmap"]);
-		votes[5] = level CreateVoteDisplayObject(70, -120 + 200, level.mapvotedata["thirdmap"]);
+		votes[3] = level CreateVoteDisplayObject(70, -120 + 120, level.mapvotedata["fourthmap"]);
+		votes[4] = level CreateVoteDisplayObject(70, -120 + 160, level.mapvotedata["fifthmap"]);
+		votes[5] = level CreateVoteDisplayObject(70, -120 + 200, level.mapvotedata["sixthmap"]);
 	} 
 	else 
 	{
@@ -795,9 +820,9 @@ MapvoteServerUI()
 		options[0] = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[0].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
 		options[1] = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[1].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
 		options[2] = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + level.mapvotedata["thirdmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[2].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
-		options[3] = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[3].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
-		options[4] = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[4].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
-		options[5] = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + level.mapvotedata["thirdmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[5].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[3] = level CreateString("^7" + level.mapvotedata["fourthmap"].mapname + "\n" + level.mapvotedata["fourthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[3].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[4] = level CreateString("^7" + level.mapvotedata["fifthmap"].mapname + "\n" + level.mapvotedata["fifthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[4].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[5] = level CreateString("^7" + level.mapvotedata["sixthmap"].mapname + "\n" + level.mapvotedata["sixthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[5].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
 		level.mapvotedata["options"] = options_bg; // Used to move client HUD for selection
 	}
 	else 
