@@ -474,6 +474,8 @@ MapvotePlayerUI()
 	boxes = [];
 	if(GetDvarInt("mv_extended"))
 	{
+		self notifyonplayercommand("left", "+actionslot 1");
+    	self notifyonplayercommand("right", "+actionslot 2");
 		box = self CreateRectangle("center", "center", 0, -120, 205, 32, scrollcolor, "white", 5, 0.7);
 		box_selected = self CreateRectangle("center", "center", 0, -120, 205, 32, scrollcolor, "white", 4, 0);
 		self.statusicon = "veh_hud_target_chopperfly"; // Red dot
@@ -522,6 +524,8 @@ MapvotePlayerUI()
 		}
 	} 
 	else {
+		self notifyonplayercommand("left", "+actionslot 3");
+    	self notifyonplayercommand("right", "+actionslot 4");
 		boxes[0] = self CreateRectangle("center", "center", -220, -452, 205, 133, scrollcolor, "white", 1, 1);
 		boxes[1] = self CreateRectangle("center", "center", 0, -452, 205, 133, bgcolor, "white", 1, 1);
 		boxes[2] = self CreateRectangle("center", "center", 220, -452, 205, 133, bgcolor, "white", 1, 1);
@@ -598,9 +602,14 @@ destroyBoxes(boxes)
 {
 	level endon("game_ended");
 	level waittill("mapvote_end");
-	foreach (box in boxes)
+	for (i = 0; i < boxes.size; i++)
 	{
-		box affectElement("alpha", 0.5, 0);
+		boxes[i] affectElement("alpha", 0.5, 0);
+	}
+	wait 0.5;
+	for (i = 0; i < boxes.size; i++)
+	{
+		boxes[i] destroy();
 	}
 }
 
@@ -703,9 +712,10 @@ MapvoteHandler()
 		{
 			voting = false;
 
-			votes[0].displayarea affectElement("alpha", 0.5, 0);
-			votes[1].displayarea affectElement("alpha", 0.5, 0);
-			votes[2].displayarea affectElement("alpha", 0.5, 0);
+			for(i = 0; i < votes.size; i++)
+			{
+				votes[i].displayarea affectElement("alpha", 0.5, 0);
+			}
 			break;
 		}
 		else
@@ -719,7 +729,11 @@ MapvoteHandler()
 	map = winner.map;
 	MapvoteSetRotation(map.mapid, map.gametype);
 
-	wait 1.2;
+	for(i = 0; i < votes.size; i++)
+	{
+		votes[i].displayarea destroy();
+	}
+	wait 5;
 }
 
 /**
@@ -808,6 +822,7 @@ MapvoteServerUI()
 	options_bg = [];
 	if(GetDvarInt("mv_extended"))
 	{
+		buttons setText("^3[{+speed_throw}]^7/^3[{+actionslot 1}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]^7/^3[{+actionslot 2}] ");
 		buttons setPoint("center", "center", 0, 120);
 		
 		options_bg[0] = level CreateRectangle("center", "center", 0, -120, 205, 32, (1, 1, 1), "black", 1, 0, 1);
@@ -817,16 +832,17 @@ MapvoteServerUI()
 		options_bg[4] = level CreateRectangle("center", "center", 0, -120 + 160, 205, 32, (1, 1, 1), "black", 1, 0, 1);
 		options_bg[5] = level CreateRectangle("center", "center", 0, -120 + 200, 205, 32, (1, 1, 1), "black", 1, 0, 1);
 
-		options[0] = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[0].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
-		options[1] = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[1].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
-		options[2] = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + level.mapvotedata["thirdmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[2].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
-		options[3] = level CreateString("^7" + level.mapvotedata["fourthmap"].mapname + "\n" + level.mapvotedata["fourthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[3].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
-		options[4] = level CreateString("^7" + level.mapvotedata["fifthmap"].mapname + "\n" + level.mapvotedata["fifthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[4].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
-		options[5] = level CreateString("^7" + level.mapvotedata["sixthmap"].mapname + "\n" + level.mapvotedata["sixthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[5].y - 8, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[0] = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[0].y - 7, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[1] = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[1].y - 7, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[2] = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + level.mapvotedata["thirdmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[2].y - 7, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[3] = level CreateString("^7" + level.mapvotedata["fourthmap"].mapname + "\n" + level.mapvotedata["fourthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[3].y - 7, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[4] = level CreateString("^7" + level.mapvotedata["fifthmap"].mapname + "\n" + level.mapvotedata["fifthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[4].y - 7, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
+		options[5] = level CreateString("^7" + level.mapvotedata["sixthmap"].mapname + "\n" + level.mapvotedata["sixthmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[5].y - 7, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
 		level.mapvotedata["options"] = options_bg; // Used to move client HUD for selection
 	}
 	else 
 	{
+		buttons setText("^3[{+speed_throw}]^7  /            ^3[{+actionslot 3}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]^7  /            ^3[{+actionslot 4}] ");
 		buttons setPoint("center", "center", 0, 80);
 		options[0] = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "center", "center", -220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
 		options[1] = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "center", "center", 0, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
@@ -869,8 +885,6 @@ MapvoteServerUI()
 	
 	timer setTimer(level.mapvotedata["time"]);
 	wait level.mapvotedata["time"];
-	level notify("mapvote_end");
-	level notify("vote", -1);
 
 	for(i = 0; i < options.size; i++)
 	{
@@ -879,12 +893,29 @@ MapvoteServerUI()
 	}
 
 	timer affectElement("alpha", 0.5, 0);
+	buttons affectElement("alpha", 0.5, 0);
+	credits affectElement("alpha", 0.5, 0);
 
 	foreach (player in level.players)
 	{
 		player notify("mapvote_end");
 		player SetBlurForPlayer(0, 0);
 	}
+
+	wait 0.5;
+
+	level notify("mapvote_end");
+	level notify("vote", -1);
+
+	timer destroy();
+	buttons destroy();
+	credits destroy();
+	for(i = 0; i < options.size; i++)
+	{
+		options[i] destroy();
+		options_bg[i] destroy();
+	}
+
 }
 
 // Utils
