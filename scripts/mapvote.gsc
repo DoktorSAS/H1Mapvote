@@ -1059,6 +1059,8 @@ mapToDisplayName(mapid)
 		return "Karachi";
 	case "mp_quarry":
 		return "Quarry";
+	case "mp_rundown":
+		return "Rundown";
 	case "mp_rust":
 		return "Rust";
 	case "mp_boneyard":
