@@ -47,7 +47,7 @@ Setting up the mapvote for your Call of Duty: Modern Warfare Remastered server i
 | Dvar                | Default Value  | Description                                            |
 |--------------------|----------------|--------------------------------------------------------|
 | `mv_enable`        | 1              | Enable/Disable the mapvote (1 for enable, 0 for disable). |
-| `mv_maps`          | ""             | List of maps that can be voted on the mapvote; leave empty for all maps. |
+| `mv_maps`          | ""             | Lists of maps that can be voted on the mapvote; leave empty for all maps. |
 | `mv_time`          | 20             | Time (in seconds) allotted for voting.                  |
 | `mv_credits`       | 1              | Enable/Disable credits of the mod creator.              |
 | `mv_socialname`    | "Discord"      | Name of the server's social platform (Discord, Twitter, Website, etc.). |
@@ -61,7 +61,7 @@ Setting up the mapvote for your Call of Duty: Modern Warfare Remastered server i
 | `mv_gametypes`     | ""             | Dvar to have multiple gametypes with different maps. Specify gametype IDs and associated files. |
 | `mv_allowchangevote`| 1             | Enable/Disable the possibility to change the vote while the time is still running (1 for enable, 0 for disable). |
 | `mv_randomoption`    | 1             | If set to 1 it will not display which map and which gametype the last option will be (Random) |
-| `mv_gametypes_norepeat`| 1             |  If set to 0 all options will have a different gametype  |
-| `mv_maps_norepeat`   | 1             | If set to 0 it will not display the same maps  |
+| `mv_gametypes_norepeat`| 1             |  If set to 1 it will not repeat the maps gametypes  |
+| `mv_maps_norepeat`   | 1             | If set to 1 it will not repeat the maps  |
 | `mv_minplayerstovote`| 1             | Set the minimum number of players required to start the mapvote  |
 | `mv_extended`| 1             | If set to 1 it will allow to choose between 6 maps  |
