@@ -464,6 +464,7 @@ MapvotePlayerUI()
 
 	self notifyonplayercommand("left", "+attack");
 	self notifyonplayercommand("right", "+speed_throw");
+	self notifyonplayercommand("right", "+toggleads_throw");
 	self notifyonplayercommand("left", "+moveright");
 	self notifyonplayercommand("right", "+moveleft");
 	self notifyonplayercommand("select", "+usereload");
