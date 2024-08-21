@@ -463,13 +463,23 @@ MapvotePlayerUI()
 	self SetBlurForPlayer(getDvarFloat("mv_blur"), 1.5);
 
 	self notifyonplayercommand("left", "+attack");
+	self notifyonplayercommand("left", "+rt");
+	self notifyonplayercommand("left", "+r1");
+	self notifyonplayercommand("left", "+moveright");
+
 	self notifyonplayercommand("right", "+speed_throw");
 	self notifyonplayercommand("right", "+toggleads_throw");
-	self notifyonplayercommand("left", "+moveright");
+	self notifyonplayercommand("right", "+lt");
+	self notifyonplayercommand("right", "+l1");
+	self notifyonplayercommand("right", "+ads");
 	self notifyonplayercommand("right", "+moveleft");
+	
 	self notifyonplayercommand("select", "+usereload");
 	self notifyonplayercommand("select", "+activate");
 	self notifyonplayercommand("select", "+gostand");
+	self notifyonplayercommand("select", "+use");
+    self notifyonplayercommand("select", "+x");
+    self notifyonplayercommand("select", "+reload");
 	// self freezeControlsWrapper(1); // Could be the reason why controller stop working
 
 	boxes = [];
