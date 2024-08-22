@@ -22,6 +22,8 @@
 	1.1.1:
 	- Implemented mv_extended dvar that will allow to choose in between 6 maps
 	- Solved issue https://github.com/DoktorSAS/H1Mapvote/issues/6
+	- Improved design
+	- Solved controller not working
 */
 
 init()
@@ -267,6 +269,7 @@ FixBlur()
 	self endon("disconnect");
 	level endon("game_ended");
 	self waittill("spawned_player");
+	//ExecuteMapvote(); // Its for tests!
 	self SetBlurForPlayer(0, 0);
 }
 
@@ -465,14 +468,13 @@ MapvotePlayerUI()
 	self notifyonplayercommand("left", "+attack");
 	self notifyonplayercommand("left", "+rt");
 	self notifyonplayercommand("left", "+r1");
-	self notifyonplayercommand("left", "+moveright");
+	
 
 	self notifyonplayercommand("right", "+speed_throw");
 	self notifyonplayercommand("right", "+toggleads_throw");
 	self notifyonplayercommand("right", "+lt");
 	self notifyonplayercommand("right", "+l1");
 	self notifyonplayercommand("right", "+ads");
-	self notifyonplayercommand("right", "+moveleft");
 	
 	self notifyonplayercommand("select", "+usereload");
 	self notifyonplayercommand("select", "+activate");
@@ -487,31 +489,45 @@ MapvotePlayerUI()
 	{
 		self notifyonplayercommand("left", "+actionslot 1");
     	self notifyonplayercommand("right", "+actionslot 2");
-		box = self CreateRectangle("center", "center", 0, -120, 205, 32, scrollcolor, "white", 5, 0.7);
-		box_selected = self CreateRectangle("center", "center", 0, -120, 205, 32, scrollcolor, "white", 4, 0);
+		self notifyonplayercommand("left", "+forward");
+		self notifyonplayercommand("right", "+back");
+		
 		self.statusicon = "veh_hud_target_chopperfly"; // Red dot
+		level waittill("mapvote_animate");
 		level waittill("mapvote_start");
 
 		index = 0;
 		previuesindex = -1;
 		voting = 1;
+
+		box = self CreateRectangle("center", "center", level.mapvotedata["options"][index].x, level.mapvotedata["options"][index].y, 208, 34, scrollcolor, "white", 0, 1);
+		box_selected = self CreateRectangle("center", "center", 0, -120, 208, 34, scrollcolor, "white", 0, 0);
 		while (level.mapvotedata["time"] > 0 && voting)
 		{
 			command = self waittill_any_return("left", "right", "select", "mapvote_end");
-			if (command == "right")
+			if (command == "mapvote_end")
+			{
+				box destroy();
+				box_selected destroy();
+				break;
+			}
+			else if (command == "right")
 			{
 				index++;
 				if (index == level.mapvotedata["options"].size)
 					index = 0;
+				self playsound( "missile_locking" );
 			}
 			else if (command == "left")
 			{
 				index--;
 				if (index < 0)
 					index = level.mapvotedata["options"].size - 1;
+				self playsound( "missile_locking" );
 			}
 			else if (command == "select")
 			{
+				self playsound( "player_refill_all_ammo" );
 				box_selected setpoint("center", "center", level.mapvotedata["options"][index].x,  level.mapvotedata["options"][index].y);
 				box_selected.alpha = 1;
 				self.statusicon = "compass_icon_vf_active"; // Green dot
@@ -531,52 +547,76 @@ MapvotePlayerUI()
 				}
 			}
 			//setPoint("center", "center", 0, 120);
-			box affectElement("y", 0.2, level.mapvotedata["options"][index].y);
+			//box affectElement("y", 0.2, level.mapvotedata["options"][index].y);
+			box affectElement("alpha", 0.1, 0);
+			wait 0.12;
+			box setPoint("center", "center", 0, level.mapvotedata["options"][index].y);
+			box affectElement("alpha", 0.1, 1);
+			wait 0.12;
 		}
+
+		
 	} 
 	else {
+		self notifyonplayercommand("left", "+moveleft");
+		self notifyonplayercommand("right", "+moveright");
 		self notifyonplayercommand("left", "+actionslot 3");
     	self notifyonplayercommand("right", "+actionslot 4");
-		boxes[0] = self CreateRectangle("center", "center", -220, -452, 205, 133, scrollcolor, "white", 1, 1);
-		boxes[1] = self CreateRectangle("center", "center", 0, -452, 205, 133, bgcolor, "white", 1, 1);
-		boxes[2] = self CreateRectangle("center", "center", 220, -452, 205, 133, bgcolor, "white", 1, 1);
+		//boxes[0] = self CreateRectangle("center", "center", -220, -452, 206, 133, scrollcolor, "white", 1, 1);
+		//boxes[1] = self CreateRectangle("center", "center", 0, -452, 206, 133, bgcolor, "white", 1, 1);
+		//boxes[2] = self CreateRectangle("center", "center", 220, -452, 206, 133, bgcolor, "white", 1, 1);
+
 		self thread MapvoteForceFixedAngle();
 
 		level waittill("mapvote_animate");
 
-		boxes[0] affectElement("y", 1.2, -50);
-		boxes[1] affectElement("y", 1.2, -50);
-		boxes[2] affectElement("y", 1.2, -50);
+		//boxes[0] affectElement("y", 1.2, -50);
+		//boxes[1] affectElement("y", 1.2, -50);
+		//boxes[2] affectElement("y", 1.2, -50);
 
-		self thread destroyBoxes(boxes);
+		//self thread destroyBoxes(boxes);
 		self.statusicon = "veh_hud_target_chopperfly"; // Red dot
 		level waittill("mapvote_start");
 
 		index = 0;
 		previuesindex = -1;
 		voting = 1;
+
+		box = self CreateRectangle("center", "center", level.mapvotedata["options"][index].x, level.mapvotedata["options"][index].y, 208, 34, scrollcolor, "white", 0, 1);
+		box_selected = self CreateRectangle("center", "center", 0, -120, 208, 34, scrollcolor, "white", 0, 0);
 		while (level.mapvotedata["time"] > 0 && voting)
 		{
 			command = self waittill_any_return("left", "right", "select", "mapvote_end");
-			if (command == "right")
+			if (command == "mapvote_end")
+			{
+				box destroy();
+				box_selected destroy();
+				break;
+			}
+			else if (command == "right")
 			{
 				index++;
-				if (index == boxes.size)
+				if (index == level.mapvotedata["options"].size)
 					index = 0;
+				self playsound( "missile_locking" );
 			}
 			else if (command == "left")
 			{
 				index--;
 				if (index < 0)
-					index = boxes.size - 1;
+					index = level.mapvotedata["options"].size - 1;
+				self playsound( "missile_locking" );
 			}
 			if (command == "select")
 			{
 				self.statusicon = "compass_icon_vf_active"; // Green dot
+				self playsound( "player_refill_all_ammo" );
+				box_selected setpoint("center", "center", level.mapvotedata["options"][index].x,  level.mapvotedata["options"][index].y);
+				box_selected.alpha = 1;
 				if (previuesindex >= 0)
 				{
-					select_color = getColor(getDvar("mv_selectcolor"));
-					boxes[previuesindex] affectElement("color", 0.2, bgcolor);
+					//select_color = getColor(getDvar("mv_selectcolor"));
+					//boxes[previuesindex] affectElement("color", 0.2, bgcolor);
 					level notify("vote", previuesindex, -1);
 				}
 				waittillframeend; // DO NOT REMOVE THIS LINE: IF REMOVED IT WILL CAUSE THE SECOND NOTIFY TO FAIL
@@ -584,22 +624,33 @@ MapvotePlayerUI()
 				previuesindex = index;
 
 				select_color = getColor(getDvar("mv_selectcolor"));
-				boxes[index] affectElement("color", 0.2, select_color);
+				//boxes[index] affectElement("color", 0.2, select_color);
+				box_selected affectElement("color", 0.2, select_color);
 				if (GetDvarInt("mv_allowchangevote", 1) == 0)
 				{
 					voting = 0;
 				}
 			}
-			else
+			/*else
 			{
 				for (i = 0; i < boxes.size; i++)
 				{
 					if (i != index)
+					{
 						boxes[i] affectElement("color", 0.2, bgcolor);
+					}
 					else
+					{
 						boxes[i] affectElement("color", 0.2, scrollcolor);
+					}
 				}
-			}
+			}*/
+
+			box affectElement("alpha", 0.1, 0);
+			wait 0.12;
+			box setPoint("center", "center", level.mapvotedata["options"][index].x, level.mapvotedata["options"][index].y);
+			box affectElement("alpha", 0.1, 1);
+			wait 0.12;
 		}
 	}
 	
@@ -698,16 +749,16 @@ MapvoteHandler()
 	} 
 	else 
 	{
-		votes[0] = level CreateVoteDisplayObject(-220 + 70, -325, level.mapvotedata["firstmap"]);
-		votes[1] = level CreateVoteDisplayObject(0 + 70, -325, level.mapvotedata["secondmap"]);
-		votes[2] = level CreateVoteDisplayObject(220 + 70, -325, level.mapvotedata["thirdmap"]);
-
-		votes[0].displayarea affectElement("y", 1, 0);
-		votes[1].displayarea affectElement("y", 1, 0);
-		votes[2].displayarea affectElement("y", 1, 0);
+		votes[0] = level CreateVoteDisplayObject(-220 + 70, 0, level.mapvotedata["firstmap"]);
+		votes[1] = level CreateVoteDisplayObject(0 + 70, 0, level.mapvotedata["secondmap"]);
+		votes[2] = level CreateVoteDisplayObject(220 + 70, 0, level.mapvotedata["thirdmap"]);
+		votes[0].alpha = 1;
+		votes[1].alpha = 1;
+		votes[2].alpha = 1;
+		votes[0].displayarea affectElement("alpha", 1, 1);
+		votes[1].displayarea affectElement("alpha", 1, 1);
+		votes[2].displayarea affectElement("alpha", 1, 1);
 	}
-
-	
 
 	voting = true;
 	index = 0;
@@ -829,19 +880,21 @@ MapvoteServerUI()
 	buttons.hideWhenInMenu = 0;
 
 	mv_votecolor = getDvar("mv_votecolor");
+	mv_backgroundcolor = GetColor(getDvar("mv_backgroundcolor"));
+	
 	options = [];
 	options_bg = [];
 	if(GetDvarInt("mv_extended"))
 	{
-		buttons setText("^3[{+speed_throw}]^7/^3[{+actionslot 1}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]^7/^3[{+actionslot 2}] ");
+		buttons setText("^3[{+speed_throw}]^7   /   ^3[{+actionslot 1}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]^7   /   ^3[{+actionslot 2}]");
 		buttons setPoint("center", "center", 0, 120);
 		
-		options_bg[0] = level CreateRectangle("center", "center", 0, -120, 205, 32, (1, 1, 1), "black", 1, 0, 1);
-		options_bg[1] = level CreateRectangle("center", "center", 0, -120 + 40, 205, 32, (1, 1, 1), "black", 1, 0, 1);
-		options_bg[2] = level CreateRectangle("center", "center", 0, -120 + 80, 205, 32, (1, 1, 1), "black", 1, 0, 1);
-		options_bg[3] = level CreateRectangle("center", "center", 0, -120 + 120, 205, 32, (1, 1, 1), "black", 1, 0, 1);
-		options_bg[4] = level CreateRectangle("center", "center", 0, -120 + 160, 205, 32, (1, 1, 1), "black", 1, 0, 1);
-		options_bg[5] = level CreateRectangle("center", "center", 0, -120 + 200, 205, 32, (1, 1, 1), "black", 1, 0, 1);
+		options_bg[0] = level CreateRectangle("center", "center", 0, -120, 206, 32, mv_backgroundcolor, "black", 998, 0, 1);
+		options_bg[1] = level CreateRectangle("center", "center", 0, -120 + 40, 206, 32, mv_backgroundcolor, "black", 998, 0, 1);
+		options_bg[2] = level CreateRectangle("center", "center", 0, -120 + 80, 206, 32, mv_backgroundcolor, "black", 998, 0, 1);
+		options_bg[3] = level CreateRectangle("center", "center", 0, -120 + 120, 206, 32, mv_backgroundcolor, "black", 998, 0, 1);
+		options_bg[4] = level CreateRectangle("center", "center", 0, -120 + 160, 206, 32, mv_backgroundcolor, "black", 998, 0, 1);
+		options_bg[5] = level CreateRectangle("center", "center", 0, -120 + 200, 206, 32, mv_backgroundcolor, "black", 998, 0, 1);
 
 		options[0] = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[0].y - 7, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
 		options[1] = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "LEFT", "CENTER", -90, options_bg[1].y - 7, (1, 1, 1), 1, (0, 0, 0), 0.5, 999, 1);
@@ -853,24 +906,24 @@ MapvoteServerUI()
 	}
 	else 
 	{
-		buttons setText("^3[{+speed_throw}]^7  /            ^3[{+actionslot 3}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]^7  /            ^3[{+actionslot 4}] ");
+		buttons setText("^3[{+speed_throw}]^7   /   ^3[{+actionslot 3}]              ^7Press ^3[{+gostand}] ^7or ^3[{+activate}] ^7to select              ^3[{+attack}]^7   /   ^3[{+actionslot 4}]");
 		buttons setPoint("center", "center", 0, 80);
-		options[0] = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "center", "center", -220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
-		options[1] = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "center", "center", 0, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
-		options[2] = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + level.mapvotedata["thirdmap"].gametypename, "objective", 1.1, "center", "center", 220, -325, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+		options[0] = level CreateString("^7" + level.mapvotedata["firstmap"].mapname + "\n" + level.mapvotedata["firstmap"].gametypename, "objective", 1.1, "center", "center", -220, -6, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+		options[1] = level CreateString("^7" + level.mapvotedata["secondmap"].mapname + "\n" + level.mapvotedata["secondmap"].gametypename, "objective", 1.1, "center", "center", 0, -6, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
+		options[2] = level CreateString("^7" + level.mapvotedata["thirdmap"].mapname + "\n" + level.mapvotedata["thirdmap"].gametypename, "objective", 1.1, "center", "center", 220, -6, (1, 1, 1), 1, (0, 0, 0), 0.5, 5, 1);
 
-		options_bg[0] = level CreateRectangle("center", "center", -220, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
-		options_bg[1] = level CreateRectangle("center", "center", 0, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
-		options_bg[2] = level CreateRectangle("center", "center", 220, 0, 205, 32, (1, 1, 1), "black", 3, 0, 1);
+		options_bg[0] = level CreateRectangle("center", "center", -220, 0, 206, 32, (1, 1, 1), "black", 3, 0, 1);
+		options_bg[1] = level CreateRectangle("center", "center", 0, 0, 206, 32, (1, 1, 1), "black", 3, 0, 1);
+		options_bg[2] = level CreateRectangle("center", "center", 220, 0, 206, 32, (1, 1, 1), "black", 3, 0, 1);
 		level.mapvotedata["options"] = options_bg; // Used to move client HUD for selection
 	}
 	
 	level notify("mapvote_animate");
 	for(i = 0; i < options.size; i++)
 	{
-		if(!GetDvarInt("mv_extended"))
-			options[i] affectElement("y", 1.2, -6);
-		options_bg[i] affectElement("alpha", 1.5, 0.8);
+		//if(!GetDvarInt("mv_extended"))
+		//	options[i] affectElement("y", 1.2, -6);
+		options_bg[i] affectElement("alpha", 1.5, 0.9);
 	}
 
 
@@ -1351,7 +1404,7 @@ CreateRectangle(align, relative, x, y, width, height, color, shader, sort, alpha
 		boxElem = newhudelem();
 	else
 		boxElem = newclienthudelem(self);
-	boxElem.elemType = "bar";
+	boxElem.elemType = "bar_shader";
 	boxElem.width = width;
 	boxElem.height = height;
 	boxElem.align = align;
