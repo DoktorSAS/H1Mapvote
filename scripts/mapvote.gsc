@@ -126,7 +126,41 @@ main()
 	{
 		replacefunc(maps\mp\gametypes\_damage::erasefinalkillcam, ::erasefinalkillcam);
 	}
+	// replacefunc(maps\mp\h2_killstreaks\_nuke::nukeDeath, ::nukeDeath); // uncomment this line if you play H2M and the nuke is a valid killstreaks
 }
+
+/*
+nukeDeath() // uncomment this functiom if you play H2M and the nuke is a valid killstreaks
+{
+    level endon ( "nuke_cancelled" );
+
+    level notify( "nuke_death" );
+
+    maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
+
+    AmbientStop(1);
+
+    foreach( player in level.players )
+    {
+        if ( isAlive( player ) )
+            player thread maps\mp\gametypes\_damage::finishPlayerDamageWrapper( level.nukeInfo.player, level.nukeInfo.player, 999999, 0, "MOD_EXPLOSIVE", "nuke_mp", player.origin, player.origin, "none", 0, 0 );
+    }
+
+    level.postRoundTime = 10;
+
+    nukeEndsGame = true;
+        [[level.CallMapvote]]();
+    if ( level.teamBased )
+        thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo.team, game["strings"]["nuclear_strike"], true );
+    else
+    {
+        if ( isDefined( level.nukeInfo.player ) )
+            thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo.player, game["strings"]["nuclear_strike"], true );
+        else
+            thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo, game["strings"]["nuclear_strike"], true );
+    }
+}
+*/
 
 erasefinalkillcam()
 {
