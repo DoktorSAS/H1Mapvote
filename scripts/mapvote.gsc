@@ -424,6 +424,7 @@ ArrayRemoveElement(array, todelete)
 	}
 	return newarray;
 }
+
 /**
  * Selects random maps from the given list.
  *
@@ -434,6 +435,7 @@ ArrayRemoveElement(array, todelete)
 MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from the list
 {
 	mapschoosed = [];
+	_mapsIDsList = mapsIDsList;
 	for (i = 0; i < times; i++)
 	{
 		index = randomIntRange(0, mapsIDsList.size);
@@ -443,8 +445,11 @@ MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from t
 		if (GetDvarInt("mv_maps_norepeat"))
 		{
 			mapsIDsList = ArrayRemoveElement(mapsIDsList, map);
+			if (mapsIDsList.size == 0) 
+			{
+				mapsIDsList = _mapsIDsList;
+			}
 		}
-		// arrayremovevalue(mapsIDsList , map);
 	}
 
 	return mapschoosed;
@@ -460,6 +465,7 @@ MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from t
 MapvoteChooseRandomGametypesSelection(gametypesIDsList, times) // Select random map from the list
 {
 	gametypeschoosed = [];
+	_gametypesIDsList = gametypesIDsList;
 	for (i = 0; i < times; i++)
 	{
 		index = randomIntRange(0, gametypesIDsList.size);
@@ -468,8 +474,11 @@ MapvoteChooseRandomGametypesSelection(gametypesIDsList, times) // Select random 
 		if (GetDvarInt("mv_gametypes_norepeat"))
 		{
 			gametypesIDsList = ArrayRemoveElement(gametypesIDsList, gametype);
+			if (gametypesIDsList.size == 0) 
+			{
+				gametypesIDsList = _gametypesIDsList;
+			}
 		}
-		// arrayremovevalue(mapsIDsList , map);
 	}
 
 	return gametypeschoosed;
