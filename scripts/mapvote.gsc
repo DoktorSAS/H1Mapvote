@@ -460,6 +460,7 @@ MapvoteChooseRandomMapsSelection(mapsIDsList, times) // Select random map from t
 MapvoteChooseRandomGametypesSelection(gametypesIDsList, times) // Select random map from the list
 {
 	gametypeschoosed = [];
+	_gametypesIDsList = gametypesIDsList;
 	for (i = 0; i < times; i++)
 	{
 		index = randomIntRange(0, gametypesIDsList.size);
@@ -468,7 +469,12 @@ MapvoteChooseRandomGametypesSelection(gametypesIDsList, times) // Select random 
 		if (GetDvarInt("mv_gametypes_norepeat"))
 		{
 			gametypesIDsList = ArrayRemoveElement(gametypesIDsList, gametype);
+			if(gametypesIDsList.size == 0)
+			{
+				gametypesIDsList = _gametypesIDsList;
+			}
 		}
+		
 		// arrayremovevalue(mapsIDsList , map);
 	}
 
@@ -780,15 +786,27 @@ MapvoteHandler()
 		votes[3] = level CreateVoteDisplayObject(70, -120 + 120, level.mapvotedata["fourthmap"]);
 		votes[4] = level CreateVoteDisplayObject(70, -120 + 160, level.mapvotedata["fifthmap"]);
 		votes[5] = level CreateVoteDisplayObject(70, -120 + 200, level.mapvotedata["sixthmap"]);
+		votes[0].alpha = 0;
+		votes[1].alpha = 0;
+		votes[2].alpha = 0;
+		votes[3].alpha = 0;
+		votes[4].alpha = 0;
+		votes[5].alpha = 0;
+		votes[0].displayarea affectElement("alpha", 1, 1);
+		votes[1].displayarea affectElement("alpha", 1, 1);
+		votes[2].displayarea affectElement("alpha", 1, 1);
+		votes[3].displayarea affectElement("alpha", 1, 1);
+		votes[4].displayarea affectElement("alpha", 1, 1);
+		votes[5].displayarea affectElement("alpha", 1, 1);
 	} 
 	else 
 	{
 		votes[0] = level CreateVoteDisplayObject(-220 + 70, 0, level.mapvotedata["firstmap"]);
 		votes[1] = level CreateVoteDisplayObject(0 + 70, 0, level.mapvotedata["secondmap"]);
 		votes[2] = level CreateVoteDisplayObject(220 + 70, 0, level.mapvotedata["thirdmap"]);
-		votes[0].alpha = 1;
-		votes[1].alpha = 1;
-		votes[2].alpha = 1;
+		votes[0].alpha = 0;
+		votes[1].alpha = 0;
+		votes[2].alpha = 0;
 		votes[0].displayarea affectElement("alpha", 1, 1);
 		votes[1].displayarea affectElement("alpha", 1, 1);
 		votes[2].displayarea affectElement("alpha", 1, 1);
@@ -953,16 +971,6 @@ MapvoteServerUI()
 	}
 	
 	level notify("mapvote_animate");
-	for(i = 0; i < options.size; i++)
-	{
-		//if(!GetDvarInt("mv_extended"))
-		//	options[i] affectElement("y", 1.2, -6);
-		options_bg[i] affectElement("alpha", 1.5, 0.9);
-	}
-
-
-	wait 1;
-	level notify("mapvote_start");
 
 	mv_sentence = getDvar("mv_sentence");
 	mv_socialname = getDvar("mv_socialname");
@@ -970,6 +978,16 @@ MapvoteServerUI()
 	credits = level createServerFontString("objective", 1.2);
 	credits setPoint("center", "center", -200, 180);
 	credits setText(mv_sentence + "\nDeveloped by @^5DoktorSAS ^7\n" + mv_socialname + ": " + mv_sociallink);
+
+	for(i = 0; i < options.size; i++)
+	{
+		//if(!GetDvarInt("mv_extended"))
+		//	options[i] affectElement("y", 1.2, -6);
+		options_bg[i] affectElement("alpha", 1.5, 0.9);
+	}
+
+	wait 1;
+	level notify("mapvote_start");
 
 	timer = level createServerFontString("objective", 2);
 	if(GetDvarInt("mv_extended"))
