@@ -7,7 +7,7 @@
 /*
 	Plutonium H1 & H2 Mapvote
 	Developed by DoktorSAS
-	Version: v1.1.0
+	Version: v1.1.1
 
 	1.0.0:
 	- 3 maps support
@@ -1297,6 +1297,8 @@ gametypeToDisplayName(gametype)
 		return "Sticks & Stones";
 	case "shrp":
 		return "Sharpshooter";
+	case "infect":
+        return "Infected";
 	}
 	return "invalid";
 }
