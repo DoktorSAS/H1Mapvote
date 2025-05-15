@@ -1190,6 +1190,24 @@ mapToDisplayName(mapid)
 		return "Fuel";
 	case "mp_trailerpark":
 		return "Trailer Park";
+	case "mp_bootleg":
+		return "Bootleg";
+	case "mp_dome":
+		return "Dome";
+	case "mp_lambeth":
+		return "Fallen";
+	case "mp_hardhat":
+		return "Hardhat";
+	case "mp_alpha":
+		return "Lockdown";
+	case "mp_bravo":
+		return "Mission";
+	case "mp_paris":
+		return "Resistance ";
+	case "mp_underground":
+		return "Underground";
+	case "mp_courtyard_ss":
+		return "Erosion";
 	default:
 		return mapid;
 	}
